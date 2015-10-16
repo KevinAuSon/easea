@@ -5,7 +5,6 @@
 #ifndef EASEA_CGPNNODELIST_H
 #define EASEA_CGPNNODELIST_H
 
-#include "CGPNode.h"
 #include "CGPNNode.h"
 
 /**
@@ -17,10 +16,11 @@
 
 class GPNNodeList {
 protected:
-    GPNNodeList* next;
     GPNNode* elt;
+    GPNNodeList* next;
 
 public:
+    GPNNodeList() : elt(NULL), next(NULL) {}
     GPNNodeList(GPNNode* node) : elt(node), next(NULL) {}
 
     ~GPNNodeList() { delete next; }

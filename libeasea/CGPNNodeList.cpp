@@ -2,8 +2,11 @@
 // Created by rinku on 10/16/15.
 //
 
-#include <global.h>
+#include "include/CRandomGenerator.h"
+#include "include/global.h"
 #include "include/CGPNNodeList.h"
+
+extern CRandomGenerator* globalRandomGenerator;
 
 /**
  * Return the list of all the node of depth 'depth'.

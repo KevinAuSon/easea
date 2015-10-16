@@ -2,9 +2,13 @@
 // Created by rinku on 10/15/15.
 //
 
-#include <global.h>
 #include <sstream>
+
+#include "include/CRandomGenerator.h"
 #include "include/CGPNNode.h"
+#include "include/global.h"
+
+extern CRandomGenerator* globalRandomGenerator;
 
 /**
     Compute the maximum depth of a tree, rooted on root.

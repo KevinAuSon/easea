@@ -5,7 +5,7 @@
 #ifndef EASEA_CGPNNODE_H
 #define EASEA_CGPNNODE_H
 
-#include <CGPNode.h>
+#include "CGPNode.h"
 
 using namespace std;
 

@@ -33,3 +33,6 @@
 *.ptx
 *.cubin
 *.fatbin
+
+# idea editor
+.idea/

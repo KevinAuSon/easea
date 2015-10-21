@@ -93,11 +93,11 @@ float* outputs;
 \INSERT_GP_OPCODE_DECL
 
 
-GPNode* ramped_hh(){
-  return RAMPED_H_H(INIT_TREE_DEPTH_MIN,INIT_TREE_DEPTH_MAX,EA->population->actualParentPopulationSize,EA->population->parentPopulationSize,0, VAR_LEN, OPCODE_SIZE,opArity, OP_ERC);
+GPNNode* ramped_hh(){
+  return TreeConstruct(INIT_TREE_DEPTH_MIN,INIT_TREE_DEPTH_MAX,EA->population->actualParentPopulationSize,EA->population->parentPopulationSize,0, VAR_LEN, OPCODE_SIZE,opArity, OP_ERC);
 }
 
-std::string toString(GPNode* root){
+std::string toString(GPNNode* root){
   return toString(root,opArity,opCodeName,OP_ERC);
 }
 
@@ -108,10 +108,19 @@ std::string toString(GPNode* root){
 \INSERT_INITIALISATION_FUNCTION
 \INSERT_FINALIZATION_FUNCTION
 
-float recEval(GPNode* root, float* input) {
-  float OP1=0, OP2= 0, RESULT = 0;
-  if( opArity[(int)root->opCode]>=1) OP1 = recEval(root->children[0],input);
-  if( opArity[(int)root->opCode]>=2) OP2 = recEval(root->children[1],input);
+float recEval(GPNNode* root, float* input) {
+  int nOp = root->getArity();
+  GPNNode* curs = root->getFirstChild();
+
+  float *OPS;
+  OPS = new float[nOp];
+  float RESULT = 0;
+
+  for(int i = 0; i < nOp; i++) {
+    ops[i] = recEval(curs, input);
+    curs = curs->getBrother();
+  }
+
   switch( root->opCode ){
 \INSERT_GP_CPU_SWITCH
   default:
@@ -122,17 +131,17 @@ float recEval(GPNode* root, float* input) {
 }
 
 
-GPNode* pickNthNode(GPNode* root, int N, int* childId){
-
-  GPNode* stack[TREE_DEPTH_MAX*MAX_ARITY];
-  GPNode* parentStack[TREE_DEPTH_MAX*MAX_ARITY];
+GPNNode* pickNthNode(GPNNode* root, int N, int* childId){
+/*
+  GPNNode* stack[TREE_DEPTH_MAX*MAX_ARITY];
+  GPNNode* parentStack[TREE_DEPTH_MAX*MAX_ARITY];
   int stackPointer = 0;
 
   parentStack[stackPointer] = NULL;
   stack[stackPointer++] = root;
 
   for( int i=0 ; i<N ; i++ ){
-    GPNode* currentNode = stack[stackPointer-1];
+    GPNNode* currentNode = stack[stackPointer-1];
     stackPointer--;
     for( int j=opArity[(int)currentNode->opCode] ; j>0 ; j--){
       parentStack[stackPointer] = currentNode;
@@ -150,16 +159,17 @@ GPNode* pickNthNode(GPNode* root, int N, int* childId){
       break;
     }
   }
-  return parentStack[stackPointer];
+  return parentStack[stackPointer];*/
+  return root;
 }
 
 void simple_mutator(IndividualImpl* Genome){
 
   // Cassical  mutation
   // select a node
-  int mutationPointChildId = 0;
+  /*int mutationPointChildId = 0;
   int mutationPointDepth = 0;
-  GPNode* mutationPointParent = selectNode(Genome->root, &mutationPointChildId, &mutationPointDepth);
+  GPNNode* mutationPointParent = selectNode(Genome->root, &mutationPointChildId, &mutationPointDepth);
   
   
   if( !mutationPointParent ){
@@ -168,12 +178,12 @@ void simple_mutator(IndividualImpl* Genome){
   }
   delete mutationPointParent->children[mutationPointChildId] ;
   mutationPointParent->children[mutationPointChildId] =
-    construction_method( VAR_LEN+1, OPCODE_SIZE , 1, TREE_DEPTH_MAX-mutationPointDepth ,0,opArity,OP_ERC);
+    construction_method( VAR_LEN+1, OPCODE_SIZE , 1, TREE_DEPTH_MAX-mutationPointDepth ,0,opArity,OP_ERC);*/
 }
 
 
 void simpleCrossOver(IndividualImpl& p1, IndividualImpl& p2, IndividualImpl& c){
-  int depthP1 = depthOfTree(p1.root);
+  /*int depthP1 = depthOfTree(p1.root);
   int depthP2 = depthOfTree(p2.root);
 
   int nbNodeP1 = enumTreeNodes(p1.root);
@@ -186,8 +196,8 @@ void simpleCrossOver(IndividualImpl& p1, IndividualImpl& p2, IndividualImpl& c){
   bool graftCouldBeTerminal = globalRandomGenerator->tossCoin(0.1);
 
   int childrenDepth = 0, Np1 = 0 , Np2 = 0;
-  GPNode* stockParentNode = NULL;
-  GPNode* graftParentNode = NULL;
+  GPNNode* stockParentNode = NULL;
+  GPNNode* graftParentNode = NULL;
 
   unsigned tries = 0;
   do{
@@ -244,7 +254,7 @@ void simpleCrossOver(IndividualImpl& p1, IndividualImpl& p2, IndividualImpl& c){
     delete c.root;
     c.root  = p2.root;
     p2.root = NULL;
-  }
+  }*/
 }
 
 
@@ -539,7 +549,7 @@ EvolutionaryAlgorithmImpl::~EvolutionaryAlgorithmImpl(){
 #include <string>
 #include <list>
 #include <map>
-#include "CGPNode.h"
+#include "CGPNNode.h"
 
 using namespace std;
 

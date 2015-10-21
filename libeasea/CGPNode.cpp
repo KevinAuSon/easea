@@ -7,17 +7,17 @@
 #include<sstream>
 
 
-extern CRandomGenerator* globalRandomGenerator;
+/*extern CRandomGenerator* globalRandomGenerator;
 extern unsigned opArity[];
 //extern const unsigned* opArity;
 
 
-/**
+*//**
    Compute the maximum depth of a tree, rooted on root.
 
    @arg root : root of the tree
    @return : depth of current tree rooted on root
-*/
+*//*
 int depthOfTree(GPNode* root){
   int depth = 0;
   for( unsigned i=0 ; i<opArity[(int)root->opCode] ; i++ ){
@@ -63,12 +63,12 @@ void flattenDatas2D( float** inputs, int length, int width, float** flat_inputs)
 }
 
 
-/**
+*//**
    Fill the collection array with GPNode located at goalDepth
 
    @arg goalDepth: level from which GPNode are collected
    @arg collection: an empty, allocated array
-*/
+*//*
 int collectNodesDepth(const int goalDepth, GPNode** collection, int collected, int currentDepth, GPNode* root)\
 {
 
@@ -84,7 +84,7 @@ int collectNodesDepth(const int goalDepth, GPNode** collection, int collected, i
   }
 }
 
-/**
+*//**
    Pick a node in a tree. It first pick a depth and then, it pick a
    node amongst nodes at this depth. It returns the parent node,
    and by pointer, the childId of the choosen child.
@@ -95,7 +95,7 @@ int collectNodesDepth(const int goalDepth, GPNode** collection, int collected, i
 
    @return : return the address of the parent of the choosen node. Return null if the root node has been choos\
 en
-*/
+*//*
 GPNode* selectNode( GPNode* root, int* childId, int* depth){
   
   int xoverDepth = globalRandomGenerator->random(0,depthOfTree(root));
@@ -135,7 +135,7 @@ GPNode* selectNode( GPNode* root, int* childId, int* depth){
 
 
 
-/**
+*//**
    Recursive construction method for trees.
    Koza construction methods. Function set has to be ordered,
    with first every terminal nodes and then non-terminal.
@@ -149,7 +149,7 @@ GPNode* selectNode( GPNode* root, int* childId, int* depth){
    Otherwise, it will use grow method (defined in the same book).
  
    @return : pointer to the root node of the resulting sub tree
-*/
+*//*
 GPNode* construction_method( const int constLen, const int totalLen , const int currentDepth,
            const int maxDepth, const bool full,
            const unsigned* opArity, const int OP_ERC){
@@ -186,10 +186,10 @@ GPNode* construction_method( const int constLen, const int totalLen , const int 
 
 GPNode* RAMPED_H_H(unsigned INIT_TREE_DEPTH_MIN, unsigned INIT_TREE_DEPTH_MAX, unsigned actualParentPopulationSize, unsigned parentPopulationSize, 
        float GROW_FULL_RATIO, unsigned VAR_LEN, unsigned OPCODE_SIZE, const unsigned* opArity, const int OP_ERC){
-  /**
+  *//**
      This is the standard ramped half-and-half method
      for creation of trees.
-   */
+   *//*
   int id = actualParentPopulationSize;  
   int seg = parentPopulationSize/(INIT_TREE_DEPTH_MAX-INIT_TREE_DEPTH_MIN); 
   int currentDepth = INIT_TREE_DEPTH_MIN+id/seg;
@@ -240,7 +240,7 @@ std::string toString(GPNode* root, const unsigned* opArity , const char** opCode
 }
 
 
-/**
+*//**
    This function handles printing of tree.
    Every node is identify by its address, in memory,
    and labeled by the actual opCode.
@@ -248,7 +248,7 @@ std::string toString(GPNode* root, const unsigned* opArity , const char** opCode
    On our architecture (64bits, ubuntu 8.04 and gcc-4.3.2)
    the long int variable is sufficient to store the address
    without any warning.
- */
+ *//*
 void toDotFile_r(GPNode* root, FILE* outputFile, const unsigned* opArity , const char** opCodeName, int OP_ERC){
   if( root->opCode==OP_ERC )
     fprintf(outputFile," %ld [label=\"%s : %f\"];\n", (long int)root, opCodeName[(int)root->opCode],
@@ -267,7 +267,7 @@ void toDotFile_r(GPNode* root, FILE* outputFile, const unsigned* opArity , const
 
 
 
-/**
+*//**
    This function prints a tree in dot (graphviz format).
    This is the entry point for the print operation. (see toDotFile_r,
    for the actual function)
@@ -275,7 +275,7 @@ void toDotFile_r(GPNode* root, FILE* outputFile, const unsigned* opArity , const
    @arg root : set of trees, same type than in a individual.
    @arg baseFileName : base of filename for the output file.
    @arg treeId : the id of the tree to print, in the given set.
- */
+ *//*
 void toDotFile(GPNode* root, const char* baseFileName, int treeId, const unsigned* opArity , const char** opCodeName, int OP_ERC){
   std::ostringstream oss;
   oss << baseFileName << "-" << treeId << ".gv";
@@ -292,4 +292,4 @@ void toDotFile(GPNode* root, const char* baseFileName, int treeId, const unsigne
     toDotFile_r( root, outputFile,opArity,opCodeName,OP_ERC);
   fprintf(outputFile,"}\n");
   fclose(outputFile);
-}
+}*/

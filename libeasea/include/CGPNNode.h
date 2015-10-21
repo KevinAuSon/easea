@@ -29,7 +29,7 @@ class GPNNode : public GPNode {
     int getArity() {
         int result = 0;
 
-        for(GPNode* curs = this->children[0]; curs != NULL; curs = curs->children[1])
+        for(GPNNode* curs = this->getFirstChild(); curs != NULL; curs = curs->getBrother())
             result++;
 
         return result;
@@ -43,15 +43,43 @@ class GPNNode : public GPNode {
      * @return : return the node or NULL if it doesn't exist
      */
     GPNNode* getChild(int index) {
-        GPNode* result = this->children[0];
+        GPNNode* result = this->getFirstChild();
 
         while(result && index > 0) {
             index--;
-            result = result->children[1];
+            result = result->getBrother();
         }
 
-        return (GPNNode*)result;
+        return result;
     }
+
+    /**
+     * Get the first child
+     *
+     * @return : return the first child, or NULL if it doesn't exist
+     */
+    GPNNode* getFirstChild() { return (GPNNode*)this->children[0]; }
+
+    /**
+     * Get his brother
+     *
+     * @return : return the brother, or NULL if it doesn't exist
+     */
+    GPNNode* getBrother() { return (GPNNode*)this->children[1]; }
+
+    /**
+     * Set the first child
+     *
+     * @arg n : the new child
+     */
+    void setFirstChild(GPNNode* n) { this->children[0] = n; }
+
+    /**
+     * Set his brother
+     *
+     * @arg n : the new brother
+     */
+    void setBrother(GPNNode* n) { this->children[1] = n; }
 
     /**
      * Add a child to the end and give back the position.
@@ -63,18 +91,18 @@ class GPNNode : public GPNode {
      *
      */
     int addChild(GPNNode* child) {
-        GPNode* curs = this->children[0];
+        GPNNode* curs = this->getFirstChild();
         int position = 0;
 
         if(!curs)
-            this->children[0] = child;
+            this->setFirstChild(child);
         else {
-            while(curs->children[1]) {
-                curs = curs->children[1];
+            while(curs->getBrother()) {
+                curs = curs->getBrother();
                 position++;
             }
 
-            curs->children[1] = child;
+            curs->setBrother(child);
         }
 
         return position;
@@ -91,24 +119,24 @@ class GPNNode : public GPNode {
      *
      */
     int addChild(GPNNode* child, int index) {
-        GPNode* curs = this->children[0];
+        GPNNode* curs = this->getFirstChild();
         int position = 0;
 
         if(!curs || index == 0) {
-            child->children[1] = curs;
-            this->children[0] = child;
+            child->setBrother(curs);
+            this->setFirstChild(child);
         }
         else {
             position = 1;
 
-            while(curs->children[1] && index > 1) {
-                curs = curs->children[1];
+            while(curs->getBrother() && index > 1) {
+                curs = curs->getBrother();
                 position++;
                 index--;
             }
 
-            child->children[1] = curs->children[1];
-            curs->children[1] = child;
+            child->setBrother(curs->getBrother());
+            curs->setBrother(child);
         }
 
         return position;

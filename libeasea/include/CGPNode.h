@@ -110,7 +110,8 @@ class GPNode {
 };
 
 /* Here are some utility functions for the template GP */
-int depthOfTree(GPNode* root);
+
+/*int depthOfTree(GPNode* root);
 int enumTreeNodes(GPNode* root);
 int depthOfNode(GPNode* root, GPNode* node);
 
@@ -123,6 +124,6 @@ GPNode* construction_method( const int constLen, const int totalLen , const int 
 
 // display methods
 void toDotFile(GPNode* root, const char* baseFileName, int treeId, const unsigned* opArity , const char** opCodeName, int OP_ERC);
-std::string toString(GPNode* root, const unsigned* opArity , const char** opCodeName, int OP_ERC);
+std::string toString(GPNode* root, const unsigned* opArity , const char** opCodeName, int OP_ERC);*/
 
 #endif // __C_GPNODE__

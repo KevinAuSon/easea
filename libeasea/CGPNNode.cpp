@@ -25,8 +25,8 @@ int depthOfTree(GPNNode* root){
     int depth = -1;
 
     if(root) {
-        depth = MAX(depthOfTree(root->children[0]) + 1,
-                    depthOfTree(root->children[1]));
+        depth = MAX(depthOfTree(root->getFirstChild()) + 1,
+                    depthOfTree(root->getBrother()));
     }
 
     return depth;
@@ -47,8 +47,8 @@ int depthOfNode(GPNNode* root, GPNNode* node){
     if(root == node)
         depth = 0;
     else if(root){
-        depth = MAX(depthOfNode(root->children[0], node) + 1,
-                    depthOfNode(root->children[1], node));
+        depth = MAX(depthOfNode(root->getFirstChild(), node) + 1,
+                    depthOfNode(root->getBrother(), node));
     }
 
     return depth;
@@ -61,12 +61,12 @@ int depthOfNode(GPNNode* root, GPNNode* node){
 
     @return : the number of node in the tree.
 */
-int enumTreeNodes(GPNode* root){
+int enumTreeNodes(GPNNode* root){
     int nbNode = 0;
 
     if(root) {
-        nbNode = enumTreeNodes(root->children[0]) +
-                 enumTreeNodes(root->children[1]) + 1;
+        nbNode = enumTreeNodes(root->getFirstChild()) +
+                 enumTreeNodes(root->getBrother()) + 1;
     }
 
     return nbNode;
@@ -111,11 +111,11 @@ GPNNode* TreeConstructAux(const int constLen, const int totalLen, const int curr
     for(int i = 0; i < arity; i++) {
         GPNNode* temp = TreeConstructAux(constLen, totalLen, currentDepth+1,
                                          maxDepth, full, opArity, OP_ERC);
-        temp->children[1] = next;
+        temp->setBrother(next);
         next = temp;
     }
 
-    newNode->children[0] = next;
+    newNode->setFirstChild(next);
 
     if( newNode->opCode==OP_ERC )
         newNode->erc_value = globalRandomGenerator->random(0.,1.);
@@ -148,16 +148,16 @@ void toString(std::ostringstream *oss, GPNNode* root, const unsigned* opArity, c
     (*oss) << '('
            << opCodeName[root->opCode];
 
-    if(root->children[0]) {
+    if(root->getFirstChild()) {
         (*oss) << ' ';
-        toString(oss, (GPNNode*)root->children[0], opArity, opCodeName, OP_ERC);
+        toString(oss, root->getFirstChild(), opArity, opCodeName, OP_ERC);
     }
 
     (*oss) << ')';
 
-    if(root->children[1]) {
+    if(root->getBrother()) {
         (*oss) << ' ';
-        toString(oss, (GPNNode*)root->children[1], opArity, opCodeName, OP_ERC);
+        toString(oss, root->getBrother(), opArity, opCodeName, OP_ERC);
     }
 
     return;

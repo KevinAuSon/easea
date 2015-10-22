@@ -2,36 +2,36 @@
 // Created by rinku on 10/16/15.
 //
 
-#ifndef EASEA_CGPNNODELIST_H
-#define EASEA_CGPNNODELIST_H
+#ifndef EASEA_CGPNodeLIST_H
+#define EASEA_CGPNodeLIST_H
 
 #include "CGPNNode.h"
 
 /**
- *  \class   GPNNodeList
+ *  \class   GPNodeList
  *  \brief   Genetic Programming
  *  \details Used to modeling a list of node (used to keep a slice of the tree).
  *
  **/
 
-class GPNNodeList {
+class GPNodeList {
 protected:
-    GPNNode* elt;
-    GPNNodeList* next;
+    GPNode* elt;
+    GPNodeList* next;
 
 public:
-    GPNNodeList() : elt(NULL), next(NULL) {}
-    GPNNodeList(GPNNode* node) : elt(node), next(NULL) {}
+    GPNodeList() : elt(NULL), next(NULL) {}
+    GPNodeList(GPNode* node) : elt(node), next(NULL) {}
 
-    ~GPNNodeList() { delete next; }
+    ~GPNodeList() { delete next; }
 
     /**
      * Some getters
      *
      * @return : the attribute to access
      */
-    GPNNode* getElt() { return this->elt; }
-    GPNNodeList* getNext() { return this->next; }
+    GPNode* getElt() { return this->elt; }
+    GPNodeList* getNext() { return this->next; }
 
     /**
      * Add an element at the head of the list
@@ -40,8 +40,8 @@ public:
      *
      * @result : The new head of the list
      */
-    GPNNodeList* add(GPNNode* node) {
-        GPNNodeList* head = new GPNNodeList(node);
+    GPNodeList* add(GPNode* node) {
+        GPNodeList* head = new GPNodeList(node);
         head->next = this;
 
         return head;
@@ -54,8 +54,8 @@ public:
      *
      * @result : the concatenation of the lists
      */
-    GPNNodeList* concat(GPNNodeList* tail) {
-        GPNNodeList* curs = this;
+    GPNodeList* concat(GPNodeList* tail) {
+        GPNodeList* curs = this;
 
         while(curs->next) curs = curs->next;
         curs->next = tail;
@@ -73,7 +73,7 @@ public:
     }
 };
 
-GPNNodeList* getSlice(GPNNode* root, int depth);
-GPNNode* selectNode( GPNNode* root, int* childId, int* depth);
+GPNodeList* getSlice(GPNode* root, int depth);
+GPNode* selectNode( GPNode* root, int* childId, int* depth);
 
-#endif //EASEA_CGPNNODELIST_H
+#endif //EASEA_CGPNodeLIST_H

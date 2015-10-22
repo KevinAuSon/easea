@@ -102,7 +102,7 @@ void free_data(){
 \User classes :
 
 GenomeClass {
-  GPNNode* root;
+  GPNode* root;
 }
 \end
 
@@ -163,7 +163,7 @@ return sqrtf(ERROR);
   Number of generations : 50   	// NB_GEN
   Time limit: 0 			// In seconds, 0 to deactivate
   Population size : 5000			//POP_SIZE
-  Offspring size : 5000 // 40% 
+  Offspring size : 5000 // 40%
   Mutation probability : 0.1       // MUT_PROB
   Crossover probability : 0.9      // XOVER_PROB
   Evaluator goal : minimise      // Maximise

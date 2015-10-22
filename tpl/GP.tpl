@@ -93,11 +93,11 @@ float* outputs;
 \INSERT_GP_OPCODE_DECL
 
 
-GPNNode* ramped_hh(){
+GPNode* ramped_hh(){
   return TreeConstruct(INIT_TREE_DEPTH_MIN,INIT_TREE_DEPTH_MAX,EA->population->actualParentPopulationSize,EA->population->parentPopulationSize,0, VAR_LEN, OPCODE_SIZE,opArity, OP_ERC);
 }
 
-std::string toString(GPNNode* root){
+std::string toString(GPNode* root){
   return toString(root,opArity,opCodeName,OP_ERC);
 }
 
@@ -108,16 +108,16 @@ std::string toString(GPNNode* root){
 \INSERT_INITIALISATION_FUNCTION
 \INSERT_FINALIZATION_FUNCTION
 
-float recEval(GPNNode* root, float* input) {
+float recEval(GPNode* root, float* input) {
   int nOp = root->getArity();
-  GPNNode* curs = root->getFirstChild();
+  GPNode* curs = root->getFirstChild();
 
   float *OPS;
   OPS = new float[nOp];
   float RESULT = 0;
 
   for(int i = 0; i < nOp; i++) {
-    ops[i] = recEval(curs, input);
+    OPS[i] = recEval(curs, input);
     curs = curs->getBrother();
   }
 
@@ -127,21 +127,23 @@ float recEval(GPNNode* root, float* input) {
     fprintf(stderr,"error unknown terminal opcode %d\n",root->opCode);
     exit(-1);
   }
+
+  delete[] OPS;
   return RESULT;
 }
 
 
-GPNNode* pickNthNode(GPNNode* root, int N, int* childId){
+GPNode* pickNthNode(GPNode* root, int N, int* childId){
 /*
-  GPNNode* stack[TREE_DEPTH_MAX*MAX_ARITY];
-  GPNNode* parentStack[TREE_DEPTH_MAX*MAX_ARITY];
+  GPNode* stack[TREE_DEPTH_MAX*MAX_ARITY];
+  GPNode* parentStack[TREE_DEPTH_MAX*MAX_ARITY];
   int stackPointer = 0;
 
   parentStack[stackPointer] = NULL;
   stack[stackPointer++] = root;
 
   for( int i=0 ; i<N ; i++ ){
-    GPNNode* currentNode = stack[stackPointer-1];
+    GPNode* currentNode = stack[stackPointer-1];
     stackPointer--;
     for( int j=opArity[(int)currentNode->opCode] ; j>0 ; j--){
       parentStack[stackPointer] = currentNode;
@@ -169,7 +171,7 @@ void simple_mutator(IndividualImpl* Genome){
   // select a node
   /*int mutationPointChildId = 0;
   int mutationPointDepth = 0;
-  GPNNode* mutationPointParent = selectNode(Genome->root, &mutationPointChildId, &mutationPointDepth);
+  GPNode* mutationPointParent = selectNode(Genome->root, &mutationPointChildId, &mutationPointDepth);
   
   
   if( !mutationPointParent ){
@@ -196,8 +198,8 @@ void simpleCrossOver(IndividualImpl& p1, IndividualImpl& p2, IndividualImpl& c){
   bool graftCouldBeTerminal = globalRandomGenerator->tossCoin(0.1);
 
   int childrenDepth = 0, Np1 = 0 , Np2 = 0;
-  GPNNode* stockParentNode = NULL;
-  GPNNode* graftParentNode = NULL;
+  GPNode* stockParentNode = NULL;
+  GPNode* graftParentNode = NULL;
 
   unsigned tries = 0;
   do{

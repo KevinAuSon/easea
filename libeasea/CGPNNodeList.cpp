@@ -14,15 +14,15 @@ extern CRandomGenerator* globalRandomGenerator;
  * @arg root : the root of the tree
  * @arg depth : the depth of the slice to get
  *
- * @result : a list of GPNNode
+ * @result : a list of GPNode
  */
-GPNNodeList* getSlice(GPNNode* root, int depth) {
-    GPNNodeList* result = NULL;
+GPNodeList* getSlice(GPNode* root, int depth) {
+    GPNodeList* result = NULL;
 
     if(depth == 0)
-        result = new GPNNodeList(root);
+        result = new GPNodeList(root);
     else
-        result = getSlice((GPNNode*)root->children[0], depth-1)->concat(getSlice((GPNNode*)root->children[1], depth));
+        result = getSlice((GPNode*)root->getFirstChild(), depth-1)->concat(getSlice((GPNode*)root->getBrother(), depth));
 
     return result;
 }
@@ -36,13 +36,13 @@ GPNNodeList* getSlice(GPNNode* root, int depth) {
  *
  * @return : the node selected
  */
-GPNNode* selectNode( GPNNode* root, int* childId, int* depth) {
-    GPNNode* result = NULL;
+GPNode* selectNode( GPNode* root, int* childId, int* depth) {
+    GPNode* result = NULL;
 
     *depth = globalRandomGenerator->random(0, depthOfTree(root));
     if(*depth > 0) {
-        GPNNodeList* slice = getSlice(root, *depth);
-        GPNNodeList* curs = slice;
+        GPNodeList* slice = getSlice(root, *depth);
+        GPNodeList* curs = slice;
         int index = globalRandomGenerator->random(0, slice->countChildren());
 
         int currentIndex = slice->getElt()->getArity();

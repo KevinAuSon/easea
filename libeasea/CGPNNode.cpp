@@ -21,7 +21,7 @@ extern CRandomGenerator* globalRandomGenerator;
 
     @return : depth of current tree rooted on root
 */
-int depthOfTree(GPNNode* root){
+int depthOfTree(GPNode* root){
     int depth = -1;
 
     if(root) {
@@ -41,7 +41,7 @@ int depthOfTree(GPNNode* root){
 
     @return : depth of the current node
 */
-int depthOfNode(GPNNode* root, GPNNode* node){
+int depthOfNode(GPNode* root, GPNode* node){
     int depth = -1;
 
     if(root == node)
@@ -61,7 +61,7 @@ int depthOfNode(GPNNode* root, GPNNode* node){
 
     @return : the number of node in the tree.
 */
-int enumTreeNodes(GPNNode* root){
+int enumTreeNodes(GPNode* root){
     int nbNode = 0;
 
     if(root) {
@@ -88,11 +88,11 @@ int enumTreeNodes(GPNNode* root){
 
    @return : pointer to the root node of the resulting sub tree
 */
-GPNNode* TreeConstructAux(const int constLen, const int totalLen, const int currentDepth,
+GPNode* TreeConstructAux(const int constLen, const int totalLen, const int currentDepth,
                        const int maxDepth, const bool full,
                        const unsigned* opArity, const int OP_ERC){
 
-    GPNNode* newNode = new GPNNode();
+    GPNode* newNode = new GPNode();
 
     // first select the opCode for the current Node.
     if( full ){
@@ -107,9 +107,9 @@ GPNNode* TreeConstructAux(const int constLen, const int totalLen, const int curr
     int arity = opArity[newNode->opCode];
     //node->arity = arity;
 
-    GPNNode* next = NULL;
+    GPNode* next = NULL;
     for(int i = 0; i < arity; i++) {
-        GPNNode* temp = TreeConstructAux(constLen, totalLen, currentDepth+1,
+        GPNode* temp = TreeConstructAux(constLen, totalLen, currentDepth+1,
                                          maxDepth, full, opArity, OP_ERC);
         temp->setBrother(next);
         next = temp;
@@ -127,7 +127,7 @@ GPNNode* TreeConstructAux(const int constLen, const int totalLen, const int curr
 }
 
 
-GPNNode * TreeConstruct(unsigned INIT_TREE_DEPTH_MIN, unsigned INIT_TREE_DEPTH_MAX,
+GPNode * TreeConstruct(unsigned INIT_TREE_DEPTH_MIN, unsigned INIT_TREE_DEPTH_MAX,
                         unsigned actualParentPopulationSize, unsigned parentPopulationSize,
                         float GROW_FULL_RATIO, unsigned VAR_LEN, unsigned OPCODE_SIZE,
                         const unsigned* opArity, const int OP_ERC){
@@ -144,7 +144,7 @@ GPNNode * TreeConstruct(unsigned INIT_TREE_DEPTH_MIN, unsigned INIT_TREE_DEPTH_M
 }
 
 
-void toString(std::ostringstream *oss, GPNNode* root, const unsigned* opArity, const char** opCodeName, int OP_ERC) {
+void toString(std::ostringstream *oss, GPNode* root, const unsigned* opArity, const char** opCodeName, int OP_ERC) {
     (*oss) << '('
            << opCodeName[root->opCode];
 
@@ -163,7 +163,7 @@ void toString(std::ostringstream *oss, GPNNode* root, const unsigned* opArity, c
     return;
 }
 
-std::string toString(GPNNode* root, const unsigned* opArity , const char** opCodeName, int OP_ERC) {
+std::string toString(GPNode* root, const unsigned* opArity , const char** opCodeName, int OP_ERC) {
     std::ostringstream oss;
 
     toString(&oss, root, opArity, opCodeName, OP_ERC);

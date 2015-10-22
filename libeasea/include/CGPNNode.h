@@ -2,23 +2,23 @@
 // Created by rinku on 10/15/15.
 //
 
-#ifndef EASEA_CGPNNODE_H
-#define EASEA_CGPNNODE_H
+#ifndef EASEA_CGPNode_H
+#define EASEA_CGPNode_H
 
 #include "CGPNode.h"
 
 using namespace std;
 
 /**
- *  \class   GPNNode
+ *  \class   GPNode
  *  \brief   Genetic Programming
  *  \details Used to modeling nodes with n children of abstract syntax tree.
- *  It's a subclass (and an interpretation) of the CGPNode class limited to 2 children.
+ *  It's a subclass (and an interpretation) of the CGP2Node class limited to 2 children.
  *  The first children actually is his children, the second one is his brother. (A bit confusing ya)
  *
  **/
 
-class GPNNode : public GPNode {
+class GPNode : public GP2Node {
     public:
 
     /**
@@ -29,7 +29,7 @@ class GPNNode : public GPNode {
     int getArity() {
         int result = 0;
 
-        for(GPNNode* curs = this->getFirstChild(); curs != NULL; curs = curs->getBrother())
+        for(GPNode* curs = this->getFirstChild(); curs != NULL; curs = curs->getBrother())
             result++;
 
         return result;
@@ -42,8 +42,8 @@ class GPNNode : public GPNode {
      *
      * @return : return the node or NULL if it doesn't exist
      */
-    GPNNode* getChild(int index) {
-        GPNNode* result = this->getFirstChild();
+    GPNode* getChild(int index) {
+        GPNode* result = this->getFirstChild();
 
         while(result && index > 0) {
             index--;
@@ -58,28 +58,28 @@ class GPNNode : public GPNode {
      *
      * @return : return the first child, or NULL if it doesn't exist
      */
-    GPNNode* getFirstChild() { return (GPNNode*)this->children[0]; }
+    GPNode* getFirstChild() { return (GPNode*)this->children[0]; }
 
     /**
      * Get his brother
      *
      * @return : return the brother, or NULL if it doesn't exist
      */
-    GPNNode* getBrother() { return (GPNNode*)this->children[1]; }
+    GPNode* getBrother() { return (GPNode*)this->children[1]; }
 
     /**
      * Set the first child
      *
      * @arg n : the new child
      */
-    void setFirstChild(GPNNode* n) { this->children[0] = n; }
+    void setFirstChild(GPNode* n) { this->children[0] = n; }
 
     /**
      * Set his brother
      *
      * @arg n : the new brother
      */
-    void setBrother(GPNNode* n) { this->children[1] = n; }
+    void setBrother(GPNode* n) { this->children[1] = n; }
 
     /**
      * Add a child to the end and give back the position.
@@ -90,8 +90,8 @@ class GPNNode : public GPNode {
      * @result : the position of the child
      *
      */
-    int addChild(GPNNode* child) {
-        GPNNode* curs = this->getFirstChild();
+    int addChild(GPNode* child) {
+        GPNode* curs = this->getFirstChild();
         int position = 0;
 
         if(!curs)
@@ -118,8 +118,8 @@ class GPNNode : public GPNode {
      * @result : the position of the child
      *
      */
-    int addChild(GPNNode* child, int index) {
-        GPNNode* curs = this->getFirstChild();
+    int addChild(GPNode* child, int index) {
+        GPNode* curs = this->getFirstChild();
         int position = 0;
 
         if(!curs || index == 0) {
@@ -147,20 +147,20 @@ class GPNNode : public GPNode {
 
 
 /* Here are some utility functions for the template GP */
-int depthOfTree(GPNNode* root);
-int enumTreeNodes(GPNNode* root);
-int depthOfNode(GPNNode* root, GPNNode* node);
+int depthOfTree(GPNode* root);
+int enumTreeNodes(GPNode* root);
+int depthOfNode(GPNode* root, GPNode* node);
 
-GPNNode* TreeConstructAux(const int constLen, const int totalLen,
+GPNode* TreeConstructAux(const int constLen, const int totalLen,
                           const int currentDepth, const int maxDepth,
                           const bool full, const unsigned* opArity, const int OP_ERC);
 
-GPNNode* TreeConstruct(unsigned iINIT_TREE_DEPTH_MIN, unsigned iINIT_TREE_DEPTH_MAX,
+GPNode* TreeConstruct(unsigned iINIT_TREE_DEPTH_MIN, unsigned iINIT_TREE_DEPTH_MAX,
                        unsigned actualParentPopulationSize, unsigned parentPopulationSize,
                        float iGROW_FULL_RATIO, unsigned iVAR_LEN, unsigned iOPCODE_SIZE,
                        const unsigned* opArity, const int iOP_ERC);
 
-std::string toString(GPNNode* root, const unsigned* opArity , const char** opCodeName, int OP_ERC);
-void toString(std::ostringstream *oss, GPNNode* root, const unsigned* opArity, const char** opCodeName, int OP_ERC);
+std::string toString(GPNode* root, const unsigned* opArity , const char** opCodeName, int OP_ERC);
+void toString(std::ostringstream *oss, GPNode* root, const unsigned* opArity, const char** opCodeName, int OP_ERC);
 
-#endif //EASEA_CGPNNODE_H
+#endif //EASEA_CGPNode_H

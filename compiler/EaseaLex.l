@@ -354,7 +354,7 @@ exponent  ([Ee][+-]?[0-9]+)
 <TEMPLATE_ANALYSIS>"\\INSERT_GP_GPU_SWITCH" {
   for( unsigned i=0 ; i<iNoOp ; i++ ){
     fprintf(fpOutputFile,"    case %s :\n",opDesc[i]->opcode->c_str());
-    fprintf(fpOutputFile,"      %s",opDesc[i]->gpuCodeStream.str().c_str());
+    fprintf(fpOutputFile,"      %s",opDesc[i]->getGPUStream());
     fprintf(fpOutputFile,"      break;\n");
 
   }
@@ -363,7 +363,7 @@ exponent  ([Ee][+-]?[0-9]+)
 <TEMPLATE_ANALYSIS>"\\INSERT_GP_CPU_SWITCH" {
   for( unsigned i=0 ; i<iNoOp ; i++ ){
     fprintf(fpOutputFile,"  case %s :\n",opDesc[i]->opcode->c_str());
-    fprintf(fpOutputFile,"    %s\n",opDesc[i]->cpuCodeStream.str().c_str());
+    fprintf(fpOutputFile,"    %s\n",opDesc[i]->getCPUStream());
     fprintf(fpOutputFile,"    break;\n");
   }
  }
@@ -522,30 +522,8 @@ exponent  ([Ee][+-]?[0-9]+)
 
 
 <GP_COPY_OPCODE_CODE>. {
-  // Convert OP1 to OPS[1] to keep the retrocompability between NNode and Node
-  int length = strlen(yytext);
-  std::ostringstream text;
-
-  for(int i = 0; i < length; i++) {
-    if(yytext[i] == 'O' && yytext[i+1] == 'P') {
-        int n = 0;
-        i += 2;
-
-        while(isdigit(yytext[i])) {
-            n *= 10;
-            n += yytext[i];
-            i++;
-        }
-
-        text << "OPS[" << n << "]";
-        i--;
-    }
-    else
-        text << yytext[i];
-  }
-
-  opDesc[iNoOp]->cpuCodeStream << text.str();
-  opDesc[iNoOp]->gpuCodeStream << text.str();
+  opDesc[iNoOp]->cpuCodeStream << yytext;
+  opDesc[iNoOp]->gpuCodeStream << yytext;
  }
 
 <TEMPLATE_ANALYSIS>"\\INSERT_GENOME_EVAL_HDR" { 

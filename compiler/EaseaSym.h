@@ -138,6 +138,10 @@ class OPCodeDesc {
   void show(void);
   static void sort(OPCodeDesc** opDescs, unsigned len);
   OPCodeDesc();
+
+    const char* getStreamParsed(ostringstream& stream);
+    const char* getGPUStream();
+    const char* getCPUStream();
 };
 
 #endif

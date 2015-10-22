@@ -946,3 +946,33 @@ void OPCodeDesc::show(void){
 	cout << "gpu code : \n" << this->gpuCodeStream.str() << endl;
 
 }
+
+const char* OPCodeDesc::getStreamParsed(ostringstream& stream) {
+	// Convert OP1 to OPS[1] to keep the retrocompability between NNode and Node
+	const char* text = stream.str().c_str();
+	int length = strlen(text);
+	std::ostringstream result;
+
+	for(int i = 0; i < length; i++) {
+		std::cout << text[i] << std::endl;
+		if(text[i] == 'O' && text[i+1] == 'P') {
+			int n = 0;
+			i += 2;
+			while(isdigit(text[i])) {
+				n *= 10;
+				n -= ('0' - text[i]);
+				i++;
+			}
+
+			result << "OPS[" << n << "]";
+			i--;
+		}
+		else
+			result << text[i];
+	}
+
+	return result.str().c_str();
+}
+
+const char* OPCodeDesc::getGPUStream() { return this->getStreamParsed(this->gpuCodeStream); }
+const char* OPCodeDesc::getCPUStream() { return this->getStreamParsed(this->cpuCodeStream); }

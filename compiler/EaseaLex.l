@@ -30,6 +30,7 @@ Centre de Math�matiques Appliqu�es
 #endif
 
 #include "debug.h"
+#include <boost/regex.hpp>
 //#include <iostream>
 //#include <sstream>
 
@@ -521,8 +522,30 @@ exponent  ([Ee][+-]?[0-9]+)
 
 
 <GP_COPY_OPCODE_CODE>. {
-  opDesc[iNoOp]->cpuCodeStream << yytext;
-  opDesc[iNoOp]->gpuCodeStream << yytext;
+  // Convert OP1 to OPS[1] to keep the retrocompability between NNode and Node
+  int length = strlen(yytext);
+  std::ostringstream text;
+
+  for(int i = 0; i < length; i++) {
+    if(yytext[i] == 'O' && yytext[i+1] == 'P') {
+        int n = 0;
+        i += 2;
+
+        while(isdigit(yytext[i])) {
+            n *= 10;
+            n += yytext[i];
+            i++;
+        }
+
+        text << "OPS[" << n << "]";
+        i--;
+    }
+    else
+        text << yytext[i];
+  }
+
+  opDesc[iNoOp]->cpuCodeStream << text.str();
+  opDesc[iNoOp]->gpuCodeStream << text.str();
  }
 
 <TEMPLATE_ANALYSIS>"\\INSERT_GENOME_EVAL_HDR" { 

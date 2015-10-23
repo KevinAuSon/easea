@@ -132,131 +132,47 @@ float recEval(GPNode* root, float* input) {
   return RESULT;
 }
 
-
-GPNode* pickNthNode(GPNode* root, int N, int* childId){
-/*
-  GPNode* stack[TREE_DEPTH_MAX*MAX_ARITY];
-  GPNode* parentStack[TREE_DEPTH_MAX*MAX_ARITY];
-  int stackPointer = 0;
-
-  parentStack[stackPointer] = NULL;
-  stack[stackPointer++] = root;
-
-  for( int i=0 ; i<N ; i++ ){
-    GPNode* currentNode = stack[stackPointer-1];
-    stackPointer--;
-    for( int j=opArity[(int)currentNode->opCode] ; j>0 ; j--){
-      parentStack[stackPointer] = currentNode;
-      stack[stackPointer++] = currentNode->children[j-1];
-    }
-  }
-
-  //assert(stackPointer>0);
-  if( stackPointer )
-    stackPointer--;
-
-  for( unsigned i=0 ; i<opArity[(int)parentStack[stackPointer]->opCode] ; i++ ){
-    if( parentStack[stackPointer]->children[i]==stack[stackPointer] ){
-      (*childId)=i;
-      break;
-    }
-  }
-  return parentStack[stackPointer];*/
-  return root;
-}
-
 void simple_mutator(IndividualImpl* Genome){
 
   // Cassical  mutation
   // select a node
-  /*int mutationPointChildId = 0;
+  int mutationPointChildId = 0;
   int mutationPointDepth = 0;
   GPNode* mutationPointParent = selectNode(Genome->root, &mutationPointChildId, &mutationPointDepth);
   
-  
-  if( !mutationPointParent ){
-    mutationPointParent = Genome->root;
-    mutationPointDepth = 0;
+  if( mutationPointParent ) {
+    mutationPointParent->getChild(mutationPointChildId)->destruct();
+    mutationPointParent->children[mutationPointChildId] =
+            TreeConstruct(VAR_LEN + 1, OPCODE_SIZE, 1, TREE_DEPTH_MAX - mutationPointDepth, 0, opArity, OP_ERC);
   }
-  delete mutationPointParent->children[mutationPointChildId] ;
-  mutationPointParent->children[mutationPointChildId] =
-    construction_method( VAR_LEN+1, OPCODE_SIZE , 1, TREE_DEPTH_MAX-mutationPointDepth ,0,opArity,OP_ERC);*/
 }
 
 
 void simpleCrossOver(IndividualImpl& p1, IndividualImpl& p2, IndividualImpl& c){
-  /*int depthP1 = depthOfTree(p1.root);
-  int depthP2 = depthOfTree(p2.root);
+  bool parentRoot = globalRandomGenerator->tossCoin();
+  int p1Id = 0,
+      p2Id = 0;
+  int useless = 0;
 
-  int nbNodeP1 = enumTreeNodes(p1.root);
-   int nbNodeP2 = enumTreeNodes(p2.root);
+  GPNode* p1CutNode,
+          p2CutNode;
 
-  int stockPointChildId=0;
-  int graftPointChildId=0;
+  if(parentRoot) {
+    c.root = p1.root;
+    p1CutNode = selectNode(c.root, &p1Id, &useless);
+    p2CutNode = selectNode(p2.root, &p1Id, &useless);
 
-  bool stockCouldBeTerminal = globalRandomGenerator->tossCoin(0.1);
-  bool graftCouldBeTerminal = globalRandomGenerator->tossCoin(0.1);
-
-  int childrenDepth = 0, Np1 = 0 , Np2 = 0;
-  GPNode* stockParentNode = NULL;
-  GPNode* graftParentNode = NULL;
-
-  unsigned tries = 0;
-  do{
-  choose_node:
-    
-    tries++;
-    if( tries>=10 ){
-      aborded_crossover++;
-      Np1=0;
-      Np2=0;
-      break;
-    }
-
-    if( nbNodeP1<2 ) Np1=0;
-    else Np1 = (int)globalRandomGenerator->random((int)0,(int)nbNodeP1);
-    if( nbNodeP2<2 ) Np2=0;
-    else Np2 = (int)globalRandomGenerator->random((int)0,(int)nbNodeP2);
-
-
-    
-    if( Np1!=0 ) stockParentNode = pickNthNode(c.root, MIN(Np1,nbNodeP1) ,&stockPointChildId);
-    if( Np2!=0 ) graftParentNode = pickNthNode(p2.root, MIN(Np2,nbNodeP1) ,&graftPointChildId);
-
-    // is the stock and the graft an authorized type of node (leaf or inner-node)
-    if( Np1 && !stockCouldBeTerminal && opArity[(int)stockParentNode->children[stockPointChildId]->opCode]==0 ) goto choose_node;
-    if( Np2 && !graftCouldBeTerminal && opArity[(int)graftParentNode->children[graftPointChildId]->opCode]==0 ) goto choose_node;
-    
-    if( Np2 && Np1)
-      childrenDepth = depthOfNode(c.root,stockParentNode)+depthOfTree(graftParentNode->children[graftPointChildId]);
-    else if( Np1 ) childrenDepth = depthOfNode(c.root,stockParentNode)+depthP1;
-    else if( Np2 ) childrenDepth = depthOfTree(graftParentNode->children[graftPointChildId]);
-    else childrenDepth = depthP2;
-    
-  }while( childrenDepth>TREE_DEPTH_MAX );
-
-  
-  if( Np1 && Np2 ){
-    delete stockParentNode->children[stockPointChildId];
-    stockParentNode->children[stockPointChildId] = graftParentNode->children[graftPointChildId];
-    graftParentNode->children[graftPointChildId] = NULL;
+    p1CutNode->getChild(p1Id)->destruct();
+    p1CutNode->setChild(p2CutNode->getChild(p2Id), p1Id);
   }
-  else if( Np1 ){ // && Np2==NULL
-    // We want to use the root of the parent 2 as graft
-    delete stockParentNode->children[stockPointChildId];
-    stockParentNode->children[stockPointChildId] = p2.root;
-    p2.root = NULL;
-  }else if( Np2 ){ // && Np1==NULL
-    // We want to use the root of the parent 1 as stock
-    delete c.root;
-    c.root = graftParentNode->children[graftPointChildId];
-    graftParentNode->children[graftPointChildId] = NULL;
-  }else{
-    // We want to switch root nodes between parents
-    delete c.root;
-    c.root  = p2.root;
-    p2.root = NULL;
-  }*/
+  else {
+    c.root = p2.root;
+    p1CutNode = selectNode(p1.root, &p1Id, &useless);
+    p2CutNode = selectNode(c.root, &p1Id, &useless);
+
+    p2CutNode->getChild(p2Id)->destruct();
+    p2CutNode->setChild(p1CutNode->getChild(p1Id), p2Id);
+  }
 }
 
 

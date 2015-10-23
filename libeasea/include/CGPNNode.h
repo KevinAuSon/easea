@@ -21,6 +21,22 @@ using namespace std;
 class GPNode : public GP2Node {
     public:
 
+    void destruct() {
+        GPNode* child = this->getFirstChild();
+        if(child) {
+            child->destructAux();
+            delete child;
+        }
+    }
+
+    void destructAux() {
+        for (int i = 0; i < 2; ++i) {
+            if(children[i]) {
+                ((GPNode*)children[i])->destructAux();
+                delete children[i];
+            }
+        }
+    }
     /**
      *  Get the number of children of the node.
      *

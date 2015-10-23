@@ -954,7 +954,6 @@ const char* OPCodeDesc::getStreamParsed(ostringstream& stream) {
 	std::ostringstream result;
 
 	for(int i = 0; i < length; i++) {
-		std::cout << text[i] << std::endl;
 		if(text[i] == 'O' && text[i+1] == 'P') {
 			int n = 0;
 			i += 2;

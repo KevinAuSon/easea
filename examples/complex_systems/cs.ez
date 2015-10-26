@@ -9,16 +9,16 @@ __________________________________________________________*/
 
 \User declarations :
 
-// these 3 defines are mandatory here. Adjust as you like.
-#define NO_FITNESS_CASES 1024
-#define VAR_LEN 1
-#define GROW_FULL_RATIO 0.5
+//number of birds
+#define NB_BIRDS 10
 
-#define PI (3.141592653589793)
+//2 axes for the directions and the position
+#define ATTRIBUTE_BIRDS_LEN 4
+
 \end
 
 \User functions:
-#define POLY(x) x*x*x-3*x*x+x
+
 /**
    This function generates data NO_FITNESS_CASES fitness cases,
    from the polynome POLY(X) with X randomly picked between (-1,1)
@@ -31,11 +31,18 @@ __________________________________________________________*/
 int generateData(float*** inputs, float** outputs){
   int i=0;
 
-  (*inputs) = new float*[NO_FITNESS_CASES];
-  (*outputs) = new float[NO_FITNESS_CASES];
+  (*inputs) = new float*[NB_BIRDS];
+  (*outputs) = new float[NB_BIRDS];
   
-  for( i=0 ; i<NO_FITNESS_CASES ; i++ ){
-    (*inputs)[i]=new float[VAR_LEN];
+  for( i=0 ; i<NB_BIRDS ; i++ ){
+    (*inputs)[i]=new float[ATTRIBUTE_BIRDS_LEN];
+
+    //Define randomly the position and the direction of the birds
+    for (int j = 0; j < ATTRIBUTE_BIRDS_LEN; ++j) {
+      float x = random(5.,10.);
+      (*inputs)[i][j] = x;
+    }
+
     float x = random(-10.,+10.);
     (*inputs)[i][0] = x;
     (*outputs)[i] = POLY(x);
@@ -133,26 +140,22 @@ OP_DIV, "/", 2, {
 \end
 
 \GenomeClass::evaluator for each fc :
-float expected_value = OUTPUT;
-ERROR = (expected_value-EVOLVED_VALUE)*(expected_value-EVOLVED_VALUE);
 \end
 
 \GenomeClass::evaluator accumulator :
+float EVOLVED_VALUE = recEval(this->root,inputs[i]);
 return sqrtf(ERROR);
 \end
 
 
-\User Makefile options: 
-
-CXXFLAGS+=-I/usr/local/cuda/common/inc/ -I/usr/local/cuda/include/
-LDFLAGS+=
+\User Makefile options:
 \end
 
 \Default run parameters :         // Please let the parameters appear in this order
   Number of generations : 50   	// NB_GEN
   Time limit: 0 			// In seconds, 0 to deactivate
-  Population size : 5000			//POP_SIZE
-  Offspring size : 5000 // 40% 
+  Population size : 5			//POP_SIZE
+  Offspring size : 5 // 40%
   Mutation probability : 0.1       // MUT_PROB
   Crossover probability : 0.9      // XOVER_PROB
   Evaluator goal : minimise      // Maximise
@@ -169,7 +172,7 @@ LDFLAGS+=
   Generate csv stats file:false			
   Generate gnuplot script:false
   Generate R script:false
-  Plot stats:true				//Default: 0
+  Plot stats:false				//Default: 0
 
   //  Remote island model: true
   //IP	  file: ip.txt 			//File containing all the remote island's IP

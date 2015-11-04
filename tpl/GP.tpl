@@ -108,10 +108,11 @@ std::string toString(GPNode* root){
 \INSERT_INITIALISATION_FUNCTION
 \INSERT_FINALIZATION_FUNCTION
 
-float recEval(GPNode* root, float* input) {
+template <typename T>
+float recEval(GPNode* root, T* self, T* other) {
   float OP1=0, OP2= 0, RESULT = 0;
-  if( opArity[(int)root->opCode]>=1) OP1 = recEval(root->children[0],input);
-  if( opArity[(int)root->opCode]>=2) OP2 = recEval(root->children[1],input);
+  if( opArity[(int)root->opCode]>=1) OP1 = recEval(root->children[0], self, other);
+  if( opArity[(int)root->opCode]>=2) OP2 = recEval(root->children[1], self, other);
   switch( root->opCode ){
 \INSERT_GP_CPU_SWITCH
   default:
@@ -290,18 +291,18 @@ IndividualImpl::~IndividualImpl(){
 }
 
 float IndividualImpl::evaluate(){
-  float ERROR; 
- float sum = 0;
+ /* float ERROR;
+ float sum = 0;*/
   \INSERT_GENOME_EVAL_HDR
 
-   for( int i=0 ; i<NO_FITNESS_CASES ; i++ ){
-     float EVOLVED_VALUE = recEval(this->root,inputs[i]);
+   /*for( int i=0 ; i<NO_FITNESS_CASES ; i++ ){
+     float EVOLVED_VALUE = recEval(this->root,inputs[i]);*/
      \INSERT_GENOME_EVAL_BDY
-     sum += ERROR;
-   }
+ /*    sum += ERROR;
+   }*/
   this->valid = true;
-  ERROR = sum;
-  \INSERT_GENOME_EVAL_FTR    
+  //ERROR = sum;
+  \INSERT_GENOME_EVAL_FTR
 }
 
 

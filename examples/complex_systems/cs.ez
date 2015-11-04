@@ -15,31 +15,27 @@
 __________________________________________________________*/
 
 \User declarations :
-
-// these 3 defines are mandatory here. Adjust as you like.
-#define NO_FITNESS_CASES 1
 #define VAR_LEN 1
 
-#define PI (3.141592653589793)
-
+#include <math.h>
 #include "CSEnvironment.h"
 
-#define NB_AGENTS 30
-
-
-
+#define NB_AGENTS 40
+#define NB_STEPS 10
+#define LIM 50
+#define MOVE 2
 
 class Boid : public CSAgent{
 public:
     //attribute[0] : position
     //attribute[1] : direction
     //the second argument is the axis
-    float attributes[2][2];
+    int attributes[2][2];
 
     Boid() {
         for (int i = 0; i < 2; ++i) {
             for (int j = 0; j < 2; ++j)
-                attributes[i][j] = random(2.,5.);
+                attributes[i][j] = random(2, 5);
         }
     }
 
@@ -52,12 +48,24 @@ public:
 
     ~Boid(){}
 
-    bool sense(CSAgent& other) {
+    bool sense(CSAgent* other) {
         int DISTANCE = 10;
-        float *posB = ((Boid&)other).attributes[0];
-        float *posA = this->attributes[0];
+        int *posB = ((Boid*)other)->attributes[0];
+        int *posA = this->attributes[0];
 
         return sqrt(pow(posB[0] - posA[0], 2) + pow(posB[1] - posA[1], 2)) <= DISTANCE;
+    }
+
+    void action() {
+        for (int i = 0; i < 2; ++i) {
+            attributes[0][i] += attributes[1][i] ;
+            attributes[0][i] = attributes[0][i] % LIM;
+        }
+    }
+
+    bool samePos(Boid* other) {
+        return attributes[0][0] == other->attributes[0][0] &&
+               attributes[0][1] == other->attributes[0][1];
     }
 
     std::string toString() {
@@ -69,44 +77,30 @@ public:
     }
 };
 
+int nextId = 0;
+CSEnvironment<Boid>* ENV_DEFAULT;
+CSEnvironment<Boid>** envs;
+
 \end
 
 \User functions:
 
+template <typename T>
+float EVAL(List<T>* agentList) {
+    float result = NB_AGENTS;
+    for(List<T>* aList = agentList; aList->hasNext(); aList = aList->getNext()) {
+        T* agent = aList->getElt();
+        bool isDead = false;
 
+        for(List<T>* curs = agentList; curs->hasNext(); curs = curs->getNext()) {
+            if(agent != curs->getElt() && agent->samePos((Boid*)curs->getElt()))
+                isDead = true;
+        }
 
-#define POLY(x) x*x*x-3*x*x+x
-/**
-   This function generates data NO_FITNESS_CASES fitness cases,
-   from the polynome POLY(X) with X randomly picked between (-1,1)
+        if(isDead) result--;
+    }
 
-   @inputs address of the inputs array. (array will be allocated here)
-   @outputs adddress of the outputs array. (array will be allocated here)
-
-   @ret number of loaded fitness cases (should be equal to NO_FITNESS_CASES).
- */
-int generateData(float*** inputs, float** outputs){
-  int i=0;
-
-  (*inputs) = new float*[NO_FITNESS_CASES];
-  (*outputs) = new float[NO_FITNESS_CASES];
-
-  for( i=0 ; i<NO_FITNESS_CASES ; i++ ){
-    (*inputs)[i]=new float[VAR_LEN];
-    float x = random(-10.,+10.);
-    (*inputs)[i][0] = x;
-    (*outputs)[i] = POLY(x);
-  }
-
-  return NO_FITNESS_CASES;
-}
-
-
-void free_data(){
-  for( int i=0 ; i<NO_FITNESS_CASES ;i++ ) delete[] inputs[i] ;
-
-  delete[] outputs;
-  delete[] inputs;
+    return result;
 }
 \end
 
@@ -114,17 +108,15 @@ void free_data(){
 
 \Before everything else function:
 {
-  generateData(&inputs,&outputs);
-    CSEnvironment<Boid> env(3);
-    env.doOneStep();
+    //ENV_DEFAULT = new CSEnvironment<Boid>(NB_AGENTS);
+    envs = new CSEnvironment<Boid>*[EZ_POP_SIZE];
+    //std::cout << ENV_DEFAULT->toString() << std::endl;
 }
 \end
 
 \After everything else function:
 {
   std::cout << toString(((IndividualImpl*)EA->population->Best)->root) << std::endl;
-
-  free_data();
 }
 \end
 
@@ -146,19 +138,19 @@ void free_data(){
 
 
 \User classes :
-
 GenomeClass {
   GPNode* root;
+  int id;
 }
 \end
 
 \GenomeClass::display:
-
 \end
 
 \GenomeClass::initialiser :
 {
   Genome.root = ramped_hh();
+    Genome.id = nextId++;
 }
 \end
 
@@ -172,19 +164,32 @@ GenomeClass {
 \GenomeClass::mutator : // Must return the number of mutations
 {
   simple_mutator(&Genome);
-
   return 1;
 }
 \end
 
 
 \begin operator description :
-OP_X, "x", 0, {RESULT=INPUT[0];};
 OP_ERC, "ERC", 0, {RESULT=ERC;};
+OP_DISTANCE, "get_distance", 1, {
+{
+    int *posA = self->attributes[((int)OP1)%2];
+    int *posB = other->attributes[((int)OP1)%2];
+
+    //get the euclidian distance between the agent and the other
+    RESULT = sqrt(pow(posB[0] - posA[0], 2) + pow(posB[1] - posA[1], 2));
+}
+};
+OP_CHANGE_DIRECTION, "change_direction", 2, {
+{
+  int change = ((int)OP2);
+  self->attributes[1][((int)OP1)%3] += change % MOVE;
+  RESULT = change;
+}
+};
 OP_ADD, "+", 2, {RESULT=OP1+OP2;};
 OP_SUB, "-", 2, {RESULT=OP1-OP2;};
-OP_MUL, "*", 2, {RESULT=OP1*OP2;
-input[0] = 2; };
+OP_MUL, "*", 2, {RESULT=OP1*OP2;};
 OP_DIV, "/", 2, {
   if( !OP2 ) RESULT = 1;
   else RESULT = OP1/OP2;
@@ -194,26 +199,29 @@ OP_DIV, "/", 2, {
 
 
 \GenomeClass::evaluator header:
+    envs[this->id] = new CSEnvironment<Boid>(NB_AGENTS);
+    envs[this->id]->compute(NB_STEPS, recEval, this->root);
+    float res = envs[this->id]->evaluate(EVAL);
+    //std::cout << envs[this->id]->toString() << std::endl;
+    //delete envs[this->id];
 \end
 
 \GenomeClass::evaluator for each fc :
-float expected_value = OUTPUT;
-ERROR = (expected_value-EVOLVED_VALUE)*(expected_value-EVOLVED_VALUE);
 \end
 
 \GenomeClass::evaluator accumulator :
-return sqrtf(ERROR);
+    return res;
 \end
 
 
 \Default run parameters :         // Please let the parameters appear in this order
-  Number of generations : 3   	// NB_GEN
+  Number of generations : 30   	// NB_GEN
   Time limit: 0 			// In seconds, 0 to deactivate
-  Population size : 5000			//POP_SIZE
-  Offspring size : 5000 // 40% 
+  Population size : 100			//POP_SIZE
+  Offspring size : 100 // 40%
   Mutation probability : 0.1       // MUT_PROB
   Crossover probability : 0.9      // XOVER_PROB
-  Evaluator goal : minimise      // Maximise
+  Evaluator goal : maximise      // Maximise
   Selection operator: Tournament 7
   Surviving parents: 100%//percentage or absolute  
   Surviving offspring: 100%

@@ -109,7 +109,7 @@ std::string toString(GPNode* root){
 \INSERT_FINALIZATION_FUNCTION
 
 template <typename T>
-float recEval(GPNode* root, T* self, T* other) {
+float recEval(GPNode* root, T& self, T& other) {
   float OP1=0, OP2= 0, RESULT = 0;
   if( opArity[(int)root->opCode]>=1) OP1 = recEval(root->children[0], self, other);
   if( opArity[(int)root->opCode]>=2) OP2 = recEval(root->children[1], self, other);

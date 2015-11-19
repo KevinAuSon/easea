@@ -16,21 +16,25 @@ public:
     List() : first(NULL), size(0) {}
     List(ListElt<T>* newElt) : first(newElt), size(1) {}
 
-    List(const List<T>* l) : first(NULL), size(0) {
-        if(l) {
-            size = l->length();
-
-            if(!isEmpty())
-                first = new ListElt<T>(l->first);
-        }
-    }
+    List(const List<T>* l) : size(l->length()) { first = l->first;}
 
     ~List() { if(!isEmpty()) delete first; }
 
-    int length()   const { return size; }
+    List copy() {
+        List result;
+
+        if(!isEmpty()) {
+            result.size = length();
+            result.first = new ListElt<T>(getFirstElt());
+        }
+
+        return result;
+    }
+
+    int  length()  const { return size; }
     bool isEmpty() const { return length() == 0; }
 
-    T getElt(int index) {
+    T getElt(int index) const {
         ListElt<T> *curs = first;
 
         if(length() < index)
@@ -42,11 +46,20 @@ public:
         return curs->getElt();
     }
 
-    T getFirst() { return getElt(0); }
+    T getFirstElt() const { return getElt(0); }
 
     void push_front(T elt) {
         ListElt<T> *head = new ListElt<T>(elt, first);
         first = head;
+    }
+
+    List getNext() {
+        if(length() <= 0)
+            throw std::string("Try to get the next element but there is not");
+
+        size--;
+        first = first->getNext();
+        return this;
     }
 
     std::string toString() const { if(!isEmpty()) return first->toString(); }
@@ -62,7 +75,7 @@ bool operator!=(List<T>& l1, List<T>& l2) {
     if(l1.isEmpty() != l2.isEmpty())
         result = true;
     else if(!l1.isEmpty() && !l2.isEmpty() &&
-            l1.getFirst() != l2.getFirst())
+            l1.getFirstElt() != l2.getFirstElt())
         result = true;
 
     return result;

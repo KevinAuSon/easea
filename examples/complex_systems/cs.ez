@@ -25,7 +25,7 @@ __________________________________________________________*/
 #define LIM 50
 #define MOVE 2
 
-class Boid : public CSAgent{
+class Boid : public CSEntity {
 public:
     //attribute[0] : position
     //attribute[1] : direction
@@ -48,7 +48,7 @@ public:
 
     ~Boid(){}
 
-    bool sense(CSAgent* other) {
+    bool sense(CSEntity* other) {
         int DISTANCE = 10;
         int *posB = ((Boid*)other)->attributes[0];
         int *posA = this->attributes[0];
@@ -63,9 +63,9 @@ public:
         }
     }
 
-    bool samePos(Boid* other) {
-        return attributes[0][0] == other->attributes[0][0] &&
-               attributes[0][1] == other->attributes[0][1];
+    bool samePos(Boid other) {
+        return attributes[0][0] == other.attributes[0][0] &&
+               attributes[0][1] == other.attributes[0][1];
     }
 
     std::string toString() {
@@ -86,14 +86,14 @@ CSEnvironment<Boid>** envs;
 \User functions:
 
 template <typename T>
-float EVAL(List<T>* agentList) {
+float EVAL(List<T>& agentList) {
     float result = NB_AGENTS;
-    for(List<T>* aList = agentList; aList->hasNext(); aList = aList->getNext()) {
-        T* agent = aList->getElt();
+    for(List<T> aList(agentList); !aList.isEmpty(); aList = aList.getNext()) {
+        T agent = aList.getFirstElt();
         bool isDead = false;
 
-        for(List<T>* curs = agentList; curs->hasNext(); curs = curs->getNext()) {
-            if(agent != curs->getElt() && agent->samePos((Boid*)curs->getElt()))
+        for(List<T> curs(agentList); !curs.isEmpty(); curs = curs.getNext()) {
+            if(agent != curs.getFirstElt() && agent.samePos((Boid)curs.getFirstElt()))
                 isDead = true;
         }
 
@@ -173,8 +173,8 @@ GenomeClass {
 OP_ERC, "ERC", 0, {RESULT=ERC;};
 OP_DISTANCE, "get_distance", 1, {
 {
-    int *posA = self->attributes[((int)OP1)%2];
-    int *posB = other->attributes[((int)OP1)%2];
+    int *posA = self.attributes[((int)OP1)%2];
+    int *posB = other.attributes[((int)OP1)%2];
 
     //get the euclidian distance between the agent and the other
     RESULT = sqrt(pow(posB[0] - posA[0], 2) + pow(posB[1] - posA[1], 2));
@@ -183,7 +183,7 @@ OP_DISTANCE, "get_distance", 1, {
 OP_CHANGE_DIRECTION, "change_direction", 2, {
 {
   int change = ((int)OP2);
-  self->attributes[1][((int)OP1)%3] += change % MOVE;
+  self.attributes[1][((int)OP1)%3] += change % MOVE;
   RESULT = change;
 }
 };

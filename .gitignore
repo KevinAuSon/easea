@@ -33,3 +33,12 @@
 *.ptx
 *.cubin
 *.fatbin
+
+bin
+examples/*
+!examples/*/*.ez
+
+# Yah, both of them are kind of weird here...
+.idea
+notes.txt
+

@@ -1,6 +1,6 @@
 /*_________________________________________________________
 
-  This is a standard GP implementation on EASEA, 
+  This is a standard GP implementation on EASEA,
   aimed for regression.
 
   use : easea -gp regression.ez
@@ -39,14 +39,14 @@ __________________________________________________________*/
    @inputs address of the inputs array. (array will be allocated here)
    @outputs adddress of the outputs array. (array will be allocated here)
 
-   @ret number of loaded fitness cases (should be equal to NO_FITNESS_CASES).   
+   @ret number of loaded fitness cases (should be equal to NO_FITNESS_CASES).
  */
 int generateData(float*** inputs, float** outputs){
   int i=0;
 
   (*inputs) = new float*[NO_FITNESS_CASES];
   (*outputs) = new float[NO_FITNESS_CASES];
-  
+
   for( i=0 ; i<NO_FITNESS_CASES ; i++ ){
     (*inputs)[i]=new float[VAR_LEN];
     float x = random(-10.,+10.);
@@ -63,7 +63,7 @@ void free_data(){
 
   delete[] outputs;
   delete[] inputs;
-} 
+}
 \end
 
 
@@ -85,11 +85,11 @@ void free_data(){
 \At the beginning of each generation function:
 {
   //cout << "At the beginning of each generation function called" << endl;
-}		    
+}
 \end
 
 \At the end of each generation function:
-{		 
+{
   //cout << "At the end of each generation function called" << endl;
 }
 \end
@@ -159,7 +159,7 @@ return sqrtf(ERROR);
 \end
 
 
-\User Makefile options: 
+\User Makefile options:
 
 CXXFLAGS+=-I/usr/local/cuda/common/inc/ -I/usr/local/cuda/include/
 LDFLAGS+=
@@ -169,12 +169,12 @@ LDFLAGS+=
   Number of generations : 50   	// NB_GEN
   Time limit: 0 			// In seconds, 0 to deactivate
   Population size : 5000			//POP_SIZE
-  Offspring size : 5000 // 40% 
+  Offspring size : 5000 // 40%
   Mutation probability : 0.1       // MUT_PROB
   Crossover probability : 0.9      // XOVER_PROB
   Evaluator goal : minimise      // Maximise
   Selection operator: Tournament 7
-  Surviving parents: 100%//percentage or absolute  
+  Surviving parents: 100%//percentage or absolute
   Surviving offspring: 100%
   Reduce parents operator: Tournament 2
   Reduce offspring operator: Tournament 2
@@ -183,7 +183,7 @@ LDFLAGS+=
   Elitism: Strong			//Weak or Strong
   Elite: 1
   Print stats: true				//Default: 1
-  Generate csv stats file:false			
+  Generate csv stats file:false
   Generate gnuplot script:false
   Generate R script:false
   Plot stats:true				//Default: 0

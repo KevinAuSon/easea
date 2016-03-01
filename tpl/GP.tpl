@@ -77,12 +77,7 @@ CRandomGenerator* globalRandomGenerator;
 extern CEvolutionaryAlgorithm* EA;
 #define GP_TPL
 
-
-
 unsigned aborded_crossover;
-float** inputs;
-float* outputs;
-
 
 \INSERT_USER_DECLARATIONS
 \ANALYSE_USER_CLASSES

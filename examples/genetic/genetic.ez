@@ -145,9 +145,22 @@ GenomeClass {
 OP_X, "x", 0, {RESULT=INPUT[0];};
 OP_Y, "y", 0, {RESULT=INPUT[1];};
 OP_ERC, "ERC", 0, {RESULT=ERC;};
-OP_NOT, "NOT", 1, {RESULT=!OP1;};
-OP_OR, "OR", 2, {RESULT=OP1||OP2;};
-OP_AND, "AND", 2, {RESULT=OP1&&OP2;};
+OP_NOT, "NOT", 1, {
+    RESULT = false;
+    for(int i = 0; i < size; i++)
+        RESULT = RESULT || children_values[i];
+    RESULT = !RESULT;
+};
+OP_OR, "OR", 2, {
+    RESULT = false;
+    for(int i = 0; i < size; i++)
+        RESULT = RESULT || children_values[i];
+};
+OP_AND, "AND", 2, {
+    RESULT = true;
+    for(int i = 0; i < size; i++)
+        RESULT = RESULT && children_values[i];
+};
 
 \end
 

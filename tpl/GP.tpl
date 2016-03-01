@@ -104,9 +104,16 @@ std::string toString(GPNode* root){
 \INSERT_FINALIZATION_FUNCTION
 
 float recEval(GPNode* root, float* input) {
-  float OP1=0, OP2= 0, RESULT = 0;
-  if( opArity[(int)root->opCode]>=1) OP1 = recEval(root->children[0],input);
-  if( opArity[(int)root->opCode]>=2) OP2 = recEval(root->children[1],input);
+  float RESULT = 0;
+  GPNode** children = root->children;
+  float children_values[MAX_ARITY];
+  int size;
+  for(size = 0; size < MAX_ARITY; size++) {
+    if(!children[size])
+        break;
+
+    children_values[size] = recEval(children[size],input);
+  }
   switch( root->opCode ){
 \INSERT_GP_CPU_SWITCH
   default:

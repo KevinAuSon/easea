@@ -2,7 +2,7 @@
  * @file CGPNode.h
  * @version 1.0
  *
- **/  
+ **/
 
 #ifndef __C_GPNODE__
 #define __C_GPNODE__
@@ -14,15 +14,21 @@ using namespace std;
 #define MAX_ARITY 2          // maximum arrity for GP node
 
 /**
- *  \class   GPNode 
- *  \brief   Genetic Programming 
+ *  \class   GPNode
+ *  \brief   Genetic Programming
  *  \details Used to modelised nodes of abstract syntax tree
- *  
- **/ 
+ *
+ **/
 
 class GPNode {
   public:
 
+    // Class members
+    int var_id;
+    double erc_value;
+    // char opCode;
+    int opCode;
+    GPNode* children[2];
 
     GPNode(){  // Constructor
       for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
@@ -34,7 +40,7 @@ class GPNode {
   {
     for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
       this->children[EASEA_Ndx]=childrenToAdd[EASEA_Ndx];
-  }  
+  }
 
 
     GPNode(const GPNode &EASEA_Var) {  // Copy constructor
@@ -42,7 +48,7 @@ class GPNode {
       erc_value=EASEA_Var.erc_value;
       //arity=EASEA_Var.arity;
       opCode=EASEA_Var.opCode;
-      
+
       for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
         if( EASEA_Var.children[EASEA_Ndx] ) children[EASEA_Ndx] = new GPNode(*(EASEA_Var.children[EASEA_Ndx]));
         else  children[EASEA_Ndx] = NULL;
@@ -61,10 +67,10 @@ class GPNode {
       erc_value = EASEA_Var.erc_value;
       //arity = EASEA_Var.arity;
       opCode = EASEA_Var.opCode;
-      
+
       for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
         if(EASEA_Var.children[EASEA_Ndx]) children[EASEA_Ndx] = new GPNode(*(EASEA_Var.children[EASEA_Ndx]));
-      
+
       return *this;
     }
 
@@ -74,7 +80,7 @@ class GPNode {
       if (erc_value!=EASEA_Var.erc_value) return false;
       //if (arity!=EASEA_Var.arity) return false;
       if (opCode!=EASEA_Var.opCode) return false;
-      
+
       {for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
         if (children[EASEA_Ndx]!=EASEA_Var.children[EASEA_Ndx]) return false;}
 
@@ -90,23 +96,15 @@ class GPNode {
       os <<  "erc_value:" << EASEA_Var.erc_value << "\n";
       //os <<  "arity:" << EASEA_Var.arity << "\n";
       os <<  "opCode:" << EASEA_Var.opCode << "\n";
-      
+
       {os << "Array children : ";
         for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
           if( EASEA_Var.children[EASEA_Ndx] ) os << "[" << EASEA_Ndx << "]:" << *(EASEA_Var.children[EASEA_Ndx]) << "\t";}
-      
+
       os << "\n";
 
       return os;
     }
-
-
-    // Class members 
-    int var_id;
-    double erc_value;
-    // char opCode;
-    int opCode;
-    GPNode* children[2];
 };
 
 /* Here are some utility functions for the template GP */

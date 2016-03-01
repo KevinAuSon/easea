@@ -35,7 +35,7 @@
 *.fatbin
 
 bin
-examples/*
+examples/*/*
 !examples/*/*.ez
 
 # Yah, both of them are kind of weird here...

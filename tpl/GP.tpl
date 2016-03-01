@@ -160,8 +160,8 @@ void simple_mutator(IndividualImpl* Genome){
   int mutationPointChildId = 0;
   int mutationPointDepth = 0;
   GPNode* mutationPointParent = selectNode(Genome->root, &mutationPointChildId, &mutationPointDepth);
-  
-  
+
+
   if( !mutationPointParent ){
     mutationPointParent = Genome->root;
     mutationPointDepth = 0;
@@ -192,7 +192,7 @@ void simpleCrossOver(IndividualImpl& p1, IndividualImpl& p2, IndividualImpl& c){
   unsigned tries = 0;
   do{
   choose_node:
-    
+
     tries++;
     if( tries>=10 ){
       aborded_crossover++;
@@ -207,23 +207,23 @@ void simpleCrossOver(IndividualImpl& p1, IndividualImpl& p2, IndividualImpl& c){
     else Np2 = (int)globalRandomGenerator->random((int)0,(int)nbNodeP2);
 
 
-    
+
     if( Np1!=0 ) stockParentNode = pickNthNode(c.root, MIN(Np1,nbNodeP1) ,&stockPointChildId);
     if( Np2!=0 ) graftParentNode = pickNthNode(p2.root, MIN(Np2,nbNodeP1) ,&graftPointChildId);
 
     // is the stock and the graft an authorized type of node (leaf or inner-node)
     if( Np1 && !stockCouldBeTerminal && opArity[(int)stockParentNode->children[stockPointChildId]->opCode]==0 ) goto choose_node;
     if( Np2 && !graftCouldBeTerminal && opArity[(int)graftParentNode->children[graftPointChildId]->opCode]==0 ) goto choose_node;
-    
+
     if( Np2 && Np1)
       childrenDepth = depthOfNode(c.root,stockParentNode)+depthOfTree(graftParentNode->children[graftPointChildId]);
     else if( Np1 ) childrenDepth = depthOfNode(c.root,stockParentNode)+depthP1;
     else if( Np2 ) childrenDepth = depthOfTree(graftParentNode->children[graftPointChildId]);
     else childrenDepth = depthP2;
-    
+
   }while( childrenDepth>TREE_DEPTH_MAX );
 
-  
+
   if( Np1 && Np2 ){
     delete stockParentNode->children[stockPointChildId];
     stockParentNode->children[stockPointChildId] = graftParentNode->children[graftPointChildId];
@@ -275,7 +275,7 @@ void AESAEGenerationFunctionBeforeReplacement(CEvolutionaryAlgorithm* evolutiona
 
 
 IndividualImpl::IndividualImpl() : CIndividual() {
-  \GENOME_CTOR 
+  \GENOME_CTOR
   \INSERT_EO_INITIALISER
   valid = false;
   isImmigrant = false;
@@ -290,20 +290,13 @@ IndividualImpl::~IndividualImpl(){
 }
 
 float IndividualImpl::evaluate(){
-  float ERROR; 
- float sum = 0;
-  \INSERT_GENOME_EVAL_HDR
-
-   for( int i=0 ; i<NO_FITNESS_CASES ; i++ ){
-     float EVOLVED_VALUE = recEval(this->root,inputs[i]);
-     \INSERT_GENOME_EVAL_BDY
-     sum += ERROR;
-   }
-  this->valid = true;
-  ERROR = sum;
-  \INSERT_GENOME_EVAL_FTR    
+  if(valid)
+    return fitness;
+  else{
+    valid = true;
+    \INSERT_EVALUATOR
+  }
 }
-
 
 void IndividualImpl::boundChecking(){
 	\INSERT_BOUND_CHECKING
@@ -426,21 +419,21 @@ void ParametersImpl::setDefaultParameters(int argc, char** argv){
 		printf("*WARNING* parentReductionSize + offspringReductionSize < parentPopulationSize\n");
 		printf("*WARNING* change Sizes in .prm or .ez\n");
 		printf("EXITING\n");
-		exit(1);	
-	} 
+		exit(1);
+	}
 	if((this->parentPopulationSize-this->parentReductionSize)>this->parentPopulationSize-this->elitSize){
 		printf("*WARNING* parentPopulationSize - parentReductionSize > parentPopulationSize - elitSize\n");
 		printf("*WARNING* change Sizes in .prm or .ez\n");
 		printf("EXITING\n");
-		exit(1);	
-	} 
+		exit(1);
+	}
 	if(!this->strongElitism && ((this->offspringPopulationSize - this->offspringReductionSize)>this->offspringPopulationSize-this->elitSize)){
 		printf("*WARNING* offspringPopulationSize - offspringReductionSize > offspringPopulationSize - elitSize\n");
 		printf("*WARNING* change Sizes in .prm or .ez\n");
 		printf("EXITING\n");
-		exit(1);	
-	} 
-	
+		exit(1);
+	}
+
 
 	/*
 	 * The reduction is set to true if reductionSize (parent or offspring) is set to a size less than the
@@ -490,7 +483,7 @@ CEvolutionaryAlgorithm* ParametersImpl::newEvolutionaryAlgorithm(){
 	generationalCriterion->setCounterEa(ea->getCurrentGenerationPtr());
 	ea->addStoppingCriterion(generationalCriterion);
 	ea->addStoppingCriterion(controlCStopingCriterion);
-	ea->addStoppingCriterion(timeCriterion);	
+	ea->addStoppingCriterion(timeCriterion);
 
 	EZ_NB_GEN=((CGenerationalCriterion*)ea->stoppingCriteria[0])->getGenerationalLimit();
 	EZ_current_generation=&(ea->currentGeneration);
@@ -507,7 +500,7 @@ void EvolutionaryAlgorithmImpl::initializeParentPopulation(){
 		  this->population->addIndividualParentPopulation(new IndividualImpl(),i);
 		  ((IndividualImpl*)this->population->parents[i])->deserialize(AESAE_Line);
 	  }
-	  
+
 	}
 	else{
   	  for( unsigned int i=0 ; i< this->params->parentPopulationSize ; i++){
@@ -575,7 +568,7 @@ public:
 
 	unsigned mutate(float pMutationPerGene);
 
-	void boundChecking();      
+	void boundChecking();
 
 	string serialize();
 	void deserialize(string AESAE_Line);
@@ -629,9 +622,9 @@ EASEALIB_PATH=$(EZ_PATH)/libeasea/
 
 CXXFLAGS =   -fopenmp -O2 -g -Wall -fmessage-length=0 -I$(EASEALIB_PATH)include -I$(EZ_PATH)boost
 
-OBJS = EASEA.o EASEAIndividual.o 
+OBJS = EASEA.o EASEAIndividual.o
 
-LIBS = -lpthread -fopenmp 
+LIBS = -lpthread -fopenmp
 ifneq ("$(OS)","")
 	LIBS += -lws2_32 -lwinmm -L"C:\MinGW\lib"
 endif
@@ -645,7 +638,7 @@ TARGET =	EASEA
 $(TARGET):	$(OBJS)
 	$(CXX) -o $(TARGET) $(OBJS) $(LDFLAGS) -g $(EASEALIB_PATH)/libeasea.a $(EZ_PATH)boost/program_options.a $(LIBS)
 
-	
+
 #%.o:%.cpp
 #	$(CXX) -c $(CXXFLAGS) $^
 
@@ -664,11 +657,11 @@ else
 endif
 
 \START_EO_PARAM_TPL#****************************************
-#                                         
+#
 #  EASEA.prm
-#                                         
+#
 #  Parameter file generated by STD.tpl AESAE v1.0
-#                                         
+#
 #***************************************
 # --seed=0   # -S : Random number seed. It is possible to give a specific seed.
 
@@ -685,11 +678,11 @@ endif
 --eliteType=\ELITISM # Strong (1) or weak (0) elitism (set elite to 0 for none)
 --survivingParents=\SURV_PAR_SIZE # Nb of surviving parents (percentage or absolute)
 --survivingOffspring=\SURV_OFF_SIZE  # Nb of surviving offspring (percentage or absolute)
---selectionOperator=\SELECTOR_OPERATOR # Selector: Deterministic, Tournament, Random, Roulette 
+--selectionOperator=\SELECTOR_OPERATOR # Selector: Deterministic, Tournament, Random, Roulette
 --selectionPressure=\SELECT_PRM
---reduceParentsOperator=\RED_PAR_OPERATOR 
+--reduceParentsOperator=\RED_PAR_OPERATOR
 --reduceParentsPressure=\RED_PAR_PRM
---reduceOffspringOperator=\RED_OFF_OPERATOR 
+--reduceOffspringOperator=\RED_OFF_OPERATOR
 --reduceOffspringPressure=\RED_OFF_PRM
 --reduceFinalOperator=\RED_FINAL_OPERATOR
 --reduceFinalPressure=\RED_FINAL_PRM

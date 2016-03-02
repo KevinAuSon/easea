@@ -8,8 +8,8 @@
 
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
-#define YY_FLEX_MINOR_VERSION 5
-#define YY_FLEX_SUBMINOR_VERSION 35
+#define YY_FLEX_MINOR_VERSION 6
+#define YY_FLEX_SUBMINOR_VERSION 0
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -162,7 +162,12 @@ typedef unsigned int flex_uint32_t;
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
 #endif
 
-extern int yyleng;
+#ifndef YY_TYPEDEF_YY_SIZE_T
+#define YY_TYPEDEF_YY_SIZE_T
+typedef size_t yy_size_t;
+#endif
+
+extern yy_size_t yyleng;
 
 extern FILE *yyin, *yyout;
 
@@ -184,6 +189,13 @@ extern FILE *yyin, *yyout;
                     if ( yytext[yyl] == '\n' )\
                         --yylineno;\
             }while(0)
+    #define YY_LINENO_REWIND_TO(dst) \
+            do {\
+                const char *p;\
+                for ( p = yy_cp-1; p >= (dst); --p)\
+                    if ( *p == '\n' )\
+                        --yylineno;\
+            }while(0)
     
 /* Return all but the first "n" matched characters back to the input stream. */
 #define yyless(n) \
@@ -200,11 +212,6 @@ extern FILE *yyin, *yyout;
 	while ( 0 )
 
 #define unput(c) yyunput( c, (yytext_ptr)  )
-
-#ifndef YY_TYPEDEF_YY_SIZE_T
-#define YY_TYPEDEF_YY_SIZE_T
-typedef size_t yy_size_t;
-#endif
 
 #ifndef YY_STRUCT_YY_BUFFER_STATE
 #define YY_STRUCT_YY_BUFFER_STATE
@@ -223,7 +230,7 @@ struct yy_buffer_state
 	/* Number of characters read into yy_ch_buf, not including EOB
 	 * characters.
 	 */
-	int yy_n_chars;
+	yy_size_t yy_n_chars;
 
 	/* Whether we "own" the buffer - i.e., we know we created it,
 	 * and can realloc() it to grow it, and should free() it to
@@ -293,8 +300,8 @@ static YY_BUFFER_STATE * yy_buffer_stack = 0; /**< Stack as an array. */
 
 /* yy_hold_char holds the character lost when yytext is formed. */
 static char yy_hold_char;
-static int yy_n_chars;		/* number of characters read into yy_ch_buf */
-int yyleng;
+static yy_size_t yy_n_chars;		/* number of characters read into yy_ch_buf */
+yy_size_t yyleng;
 
 /* Points to current character in buffer. */
 static char *yy_c_buf_p = (char *) 0;
@@ -322,7 +329,7 @@ static void yy_init_buffer (YY_BUFFER_STATE b,FILE *file  );
 
 YY_BUFFER_STATE yy_scan_buffer (char *base,yy_size_t size  );
 YY_BUFFER_STATE yy_scan_string (yyconst char *yy_str  );
-YY_BUFFER_STATE yy_scan_bytes (yyconst char *bytes,int len  );
+YY_BUFFER_STATE yy_scan_bytes (yyconst char *bytes,yy_size_t len  );
 
 void *yyalloc (yy_size_t  );
 void *yyrealloc (void *,yy_size_t  );
@@ -354,7 +361,7 @@ void yyfree (void *  );
 
 /* Begin user sect3 */
 
-#define yywrap(n) 1
+#define yywrap() (/*CONSTCOND*/1)
 #define YY_SKIP_YYWRAP
 
 typedef unsigned char YY_CHAR;
@@ -368,11 +375,17 @@ extern int yylineno;
 int yylineno = 1;
 
 extern char *yytext;
+#ifdef yytext_ptr
+#undef yytext_ptr
+#endif
 #define yytext_ptr yytext
 
 static yy_state_type yy_get_previous_state (void );
 static yy_state_type yy_try_NUL_trans (yy_state_type current_state  );
 static int yy_get_next_buffer (void );
+#if defined(__GNUC__) && __GNUC__ >= 3
+__attribute__((__noreturn__))
+#endif
 static void yy_fatal_error (yyconst char msg[]  );
 
 /* Done after the current pattern has been matched and before the
@@ -929,7 +942,7 @@ static yyconst flex_int16_t yy_accept[3383] =
      1398, 1398
     } ;
 
-static yyconst flex_int32_t yy_ec[256] =
+static yyconst YY_CHAR yy_ec[256] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
         1,    1,    4,    1,    1,    1,    1,    1,    1,    1,
@@ -961,7 +974,7 @@ static yyconst flex_int32_t yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static yyconst flex_int32_t yy_meta[79] =
+static yyconst YY_CHAR yy_meta[79] =
     {   0,
         1,    2,    3,    1,    2,    4,    1,    4,    4,    4,
         4,    4,    1,    4,    1,    4,    5,    5,    5,    1,
@@ -973,7 +986,7 @@ static yyconst flex_int32_t yy_meta[79] =
         5,    5,    5,    5,    5,    5,    1,    8
     } ;
 
-static yyconst flex_int16_t yy_base[3468] =
+static yyconst flex_uint16_t yy_base[3468] =
     {   0,
         0,    2,    6,   83,   86,   88,  138,  216,  114,  159,
       120,  122,  131,  152,  162,  164,  189,  191,  193,  195,
@@ -1743,7 +1756,7 @@ static yyconst flex_int16_t yy_def[3468] =
      3381, 3381, 3381, 3381, 3381, 3381, 3381
     } ;
 
-static yyconst flex_int16_t yy_nxt[6051] =
+static yyconst flex_uint16_t yy_nxt[6051] =
     {   0,
      3381, 3381,   71,   72,   71,   72,   73,   74,   75,   76,
        74,   73,   73,   73,   73,   73,   73,   73,   73,   73,
@@ -3259,13 +3272,13 @@ end:
   // local functions
 char* selectorDetermination(int nMINIMISE, char* sSELECTOR){
 
-  char selectorName[50];  
+  char selectorName[50];
   selectorName[3] = 0;
   if( nMINIMISE )
     strcpy(selectorName,"Min");
   else
     strcpy(selectorName,"Max");
-  
+
 
   if( mystricmp("Tournament",sSELECTOR)==0 )
     strcat(selectorName,"Tournament(globalRandomGenerator)");
@@ -3284,7 +3297,7 @@ char* selectorDetermination(int nMINIMISE, char* sSELECTOR){
     //DEBUG_PRT_PRT("%s is not yet implemented",sSELECTOR);
     return NULL;
   }
-  
+
   char* ret = (char*)malloc((strlen(selectorName)+1)*sizeof(char));
   strcpy(ret,selectorName);
 
@@ -3315,7 +3328,7 @@ void yyreset()
 
 
   CSymbolTable *pSymbolTable;   // the symbol table
-  bool bSymbolInserted,bWithinEvaluator, bWithinOptimiser;  // used to change evalutor type from double to float 
+  bool bSymbolInserted,bWithinEvaluator, bWithinOptimiser;  // used to change evalutor type from double to float
   bool bInitFunction,bDisplayFunction,bFunction, bNotFinishedYet, bWithinEO_Function;
   bool bDoubleQuotes,bWithinDisplayFunction,bWithinInitialiser,bWithinMutator,bWithinXover;
   bool bWaitingForSemiColon,bFinishNB_GEN,bFinishMINIMISE,bFinishMINIMIZE,bGenerationReplacementFunction;
@@ -3323,14 +3336,14 @@ void yyreset()
   bool bWithinCUDA_Initializer, bWithinMAKEFILEOPTION, bWithinCUDA_Evaluator, bBoundCheckingFunction;
   bool bIsParentReduce, bIsOffspringReduce, bEndGeneration, bBeginGeneration, bEndGenerationFunction, bBeginGenerationFunction, bGenerationFunctionBeforeReplacement;
   bool bGPOPCODE_ANALYSIS,bCOPY_GP_EVAL_GPU;
-  
+
   CSymbol *pASymbol;
 
   unsigned iGP_OPCODE_FIELD, accolade_counter;
   OPCodeDesc* opDesc[128];
   unsigned iNoOp;
 
-  
+
   unsigned iCOPY_GP_EVAL_STATUS;
   bool bIsCopyingGPEval;
 
@@ -3339,14 +3352,14 @@ void yyreset()
 
   // extract yylval for use later on in actions
   //YYSTYPE& yylval = *(YYSTYPE*)yyparserptr->yylvalptr;
- 
 
 
 
- 
+
+
 
 /* macros */
-#line 3350 "compiler/EaseaLex.cpp"
+#line 3363 "compiler/EaseaLex.cpp"
 
 #define INITIAL 0
 #define GENOME_ANALYSIS 1
@@ -3412,19 +3425,19 @@ void yyset_extra (YY_EXTRA_TYPE user_defined  );
 
 FILE *yyget_in (void );
 
-void yyset_in  (FILE * in_str  );
+void yyset_in  (FILE * _in_str  );
 
 FILE *yyget_out (void );
 
-void yyset_out  (FILE * out_str  );
+void yyset_out  (FILE * _out_str  );
 
-int yyget_leng (void );
+yy_size_t yyget_leng (void );
 
 char *yyget_text (void );
 
 int yyget_lineno (void );
 
-void yyset_lineno (int line_number  );
+void yyset_lineno (int _line_number  );
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -3438,8 +3451,12 @@ extern int yywrap (void );
 #endif
 #endif
 
+#ifndef YY_NO_UNPUT
+    
     static void yyunput (int c,char *buf_ptr  );
     
+#endif
+
 #ifndef yytext_ptr
 static void yy_flex_strncpy (char *,yyconst char *,int );
 #endif
@@ -3552,7 +3569,7 @@ extern int yylex (void);
 
 /* Code executed at the end of each rule. */
 #ifndef YY_BREAK
-#define YY_BREAK break;
+#define YY_BREAK /*LINTED*/break;
 #endif
 
 #define YY_RULE_SETUP \
@@ -3565,17 +3582,10 @@ extern int yylex (void);
  */
 YY_DECL
 {
-	register yy_state_type yy_current_state;
-	register char *yy_cp, *yy_bp;
-	register int yy_act;
+	yy_state_type yy_current_state;
+	char *yy_cp, *yy_bp;
+	int yy_act;
     
-#line 220 "compiler/EaseaLex.l"
-
-
-
- /*Gobbles up ^Ms, to be compatible with unix*/
-#line 3578 "compiler/EaseaLex.cpp"
-
 	if ( !(yy_init) )
 		{
 		(yy_init) = 1;
@@ -3608,7 +3618,15 @@ YY_DECL
 		yy_load_buffer_state( );
 		}
 
-	while ( 1 )		/* loops until end-of-file is reached */
+	{
+#line 220 "compiler/EaseaLex.l"
+
+
+
+ /*Gobbles up ^Ms, to be compatible with unix*/
+#line 3628 "compiler/EaseaLex.cpp"
+
+	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
 		(yy_more_len) = 0;
 		if ( (yy_more_flag) )
@@ -3635,7 +3653,7 @@ YY_DECL
 yy_match:
 		do
 			{
-			register YY_CHAR yy_c = yy_ec[YY_SC_TO_UI(*yy_cp)];
+			YY_CHAR yy_c = yy_ec[YY_SC_TO_UI(*yy_cp)] ;
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
@@ -3691,7 +3709,7 @@ find_rule: /* we branch to this label when backing up */
 
 		if ( yy_act != YY_END_OF_BUFFER && yy_rule_can_match_eol[yy_act] )
 			{
-			int yyl;
+			yy_size_t yyl;
 			for ( yyl = (yy_more_len); yyl < yyleng; ++yyl )
 				if ( yytext[yyl] == '\n' )
 					   
@@ -3722,27 +3740,27 @@ YY_RULE_SETUP
 case 3:
 YY_RULE_SETUP
 #line 234 "compiler/EaseaLex.l"
-{             
+{
   char sFileName[1000];
   strcpy(sFileName, sRAW_PROJECT_NAME);
-  strcat(sFileName,".cpp"); 
+  strcat(sFileName,".cpp");
   fpOutputFile=fopen(sFileName,"w");
  }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
 #line 240 "compiler/EaseaLex.l"
-{fprintf(fpOutputFile,"EASEA");}        
+{fprintf(fpOutputFile,"EASEA");}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 241 "compiler/EaseaLex.l"
-{fprintf(fpOutputFile,"%s",sPROJECT_NAME);}        
+{fprintf(fpOutputFile,"%s",sPROJECT_NAME);}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 242 "compiler/EaseaLex.l"
-{fprintf(fpOutputFile,"%s",sEZ_PATH);}        
+{fprintf(fpOutputFile,"%s",sEZ_PATH);}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
@@ -3752,12 +3770,12 @@ YY_RULE_SETUP
 case 8:
 YY_RULE_SETUP
 #line 244 "compiler/EaseaLex.l"
-{fprintf(fpOutputFile,"%s",sEO_DIR);}        
+{fprintf(fpOutputFile,"%s",sEO_DIR);}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
 #line 245 "compiler/EaseaLex.l"
-{fprintf(fpOutputFile,"%s",sLOWER_CASE_PROJECT_NAME);}        
+{fprintf(fpOutputFile,"%s",sLOWER_CASE_PROJECT_NAME);}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
@@ -3857,26 +3875,26 @@ case 17:
 YY_RULE_SETUP
 #line 321 "compiler/EaseaLex.l"
 {
-  
-  fprintf(fpOutputFile,"enum OPCODE              {"); 
+
+  fprintf(fpOutputFile,"enum OPCODE              {");
   for( unsigned i=0 ; i<iNoOp ; i++ ){
     fprintf(fpOutputFile,"%s,",opDesc[i]->opcode->c_str());
   }
   fprintf(fpOutputFile,"OPCODE_SIZE, OP_RETURN};\n");
 
 
-  fprintf(fpOutputFile,"const char* opCodeName[]={"); 
+  fprintf(fpOutputFile,"const char* opCodeName[]={");
   for( unsigned i=0 ; i<iNoOp ; i++ ){
     fprintf(fpOutputFile,"%s",opDesc[i]->realName->c_str());
     if( i<(iNoOp-1) )fprintf(fpOutputFile,",");
   }
-  fprintf(fpOutputFile,"};\n"); 
-  fprintf(fpOutputFile,"unsigned opArity[]=     {"); 
+  fprintf(fpOutputFile,"};\n");
+  fprintf(fpOutputFile,"unsigned opArity[]=     {");
   for( unsigned i=0 ; i<iNoOp ; i++ ){
     fprintf(fpOutputFile,"%d",opDesc[i]->arity);
     if( i<(iNoOp-1) )fprintf(fpOutputFile,",");
   }
-  fprintf(fpOutputFile,"};\n"); 
+  fprintf(fpOutputFile,"};\n");
 
   /*
   // count the number of variable (arity zero and non-erc operator)
@@ -3934,19 +3952,19 @@ YY_RULE_SETUP
 case 22:
 YY_RULE_SETUP
 #line 386 "compiler/EaseaLex.l"
-{ 
+{
   if( bGPOPCODE_ANALYSIS ){
     rewind(fpGenomeFile);
     yyin = fpTemplateFile;
     yypop_buffer_state();
     bGPOPCODE_ANALYSIS = false;
-    
+
     OPCodeDesc::sort(opDesc,iNoOp);
     /*for( unsigned i=0 ; i<iNoOp ; i++ ){
       opDesc[i]->show();
       }*/
-    BEGIN TEMPLATE_ANALYSIS; 
-  }  
+    BEGIN TEMPLATE_ANALYSIS;
+  }
  }
 	YY_BREAK
 case YY_STATE_EOF(COPY_GP_OPCODE):
@@ -3971,7 +3989,7 @@ YY_RULE_SETUP
 {if( bGPOPCODE_ANALYSIS )printf("\n");lineCounter++;}
 	YY_BREAK
 /*
-  This section analyse a GP rule which is written as : 
+  This section analyse a GP rule which is written as :
   OP_NAME, "realopname", arity (a number), { the c code for this operator};
   OP_NAME, "realopname", arity (a number), { the c code for this operator};
  */
@@ -4014,7 +4032,7 @@ YY_RULE_SETUP
     exit(-1);
   }
   char* endptr;
-  
+
   opDesc[iNoOp]->arity = strtol(yytext,&endptr,10);
   if( endptr==yytext ){
     fprintf(stderr, "warning, unable to translate this arity %s assuming 0\n",yytext);
@@ -4099,7 +4117,7 @@ YY_RULE_SETUP
   unsigned no_input = strtol(yytext+strlen("INPUT["),&endptr,10);
 //  printf("input no : %d\n",no_input);
   opDesc[iNoOp]->cpuCodeStream << "input["<< no_input <<"]" ;
-  opDesc[iNoOp]->gpuCodeStream << "input["<< no_input << "]";  
+  opDesc[iNoOp]->gpuCodeStream << "input["<< no_input << "]";
  }
 	YY_BREAK
 case 36:
@@ -4132,7 +4150,7 @@ YY_RULE_SETUP
 case 39:
 YY_RULE_SETUP
 #line 528 "compiler/EaseaLex.l"
-{ 
+{
   rewind(fpGenomeFile);
   yyin = fpGenomeFile;
   yypush_buffer_state(yy_create_buffer(yyin,YY_BUF_SIZE ));
@@ -4270,11 +4288,11 @@ case 49:
 YY_RULE_SETUP
 #line 641 "compiler/EaseaLex.l"
 {
-  if( bIsCopyingGPEval) 
+  if( bIsCopyingGPEval)
     //if( bCOPY_GP_EVAL_GPU )
       fprintf(fpOutputFile, "outputs[i]" );
     //else fprintf(fpOutputFile, "outputs[i]" );
-  
+
  }
 	YY_BREAK
 case 50:
@@ -4283,11 +4301,11 @@ YY_RULE_SETUP
 {
   char* endptr;
   unsigned no_output = strtol(yytext+strlen("OUTPUT["),&endptr,10);
-  if( bIsCopyingGPEval) 
+  if( bIsCopyingGPEval)
     if( bCOPY_GP_EVAL_GPU )
       fprintf(fpOutputFile, "outputs[(i+%d)*NUMTHREAD+tid]", no_output);
     else fprintf(fpOutputFile, "outputs[i+%d]", no_output );
-  
+
  }
 	YY_BREAK
 case 51:
@@ -4296,22 +4314,22 @@ YY_RULE_SETUP
 {
 	char *var;
 	var = strndup(yytext+strlen("OUTPUT["), strlen(yytext) - strlen("OUTPUT[") - 1);
-  if( bIsCopyingGPEval) 
+  if( bIsCopyingGPEval)
     if( bCOPY_GP_EVAL_GPU )
       fprintf(fpOutputFile, "outputs[(i+%s)*NUMTHREAD+tid]", var);
     else fprintf(fpOutputFile, "outputs[i+%s]", var);
-  
+
  }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
 #line 669 "compiler/EaseaLex.l"
 {
-  if( bIsCopyingGPEval) 
+  if( bIsCopyingGPEval)
     if( bCOPY_GP_EVAL_GPU )
       fprintf(fpOutputFile, "k_inputs[i*NUMTHREAD+tid]" );
     else fprintf(fpOutputFile, "inputs[i][0]" );
-  
+
  }
 	YY_BREAK
 case 53:
@@ -4320,11 +4338,11 @@ YY_RULE_SETUP
 {
   char* endptr;
   unsigned no_input = strtol(yytext+strlen("INPUT["),&endptr,10);
-  if( bIsCopyingGPEval) 
+  if( bIsCopyingGPEval)
     if( bCOPY_GP_EVAL_GPU )
       fprintf(fpOutputFile, "k_inputs[(i+%d)*NUMTHREAD+tid]", no_input);
     else fprintf(fpOutputFile, "inputs[i+%d][0]", no_input );
-  
+
  }
 	YY_BREAK
 case 54:
@@ -4333,11 +4351,11 @@ YY_RULE_SETUP
 {
 	char *var;
 	var = strndup(yytext+strlen("INPUT["), strlen(yytext) - strlen("INPUT[") - 1);
-  if( bIsCopyingGPEval) 
+  if( bIsCopyingGPEval)
     if( bCOPY_GP_EVAL_GPU )
       fprintf(fpOutputFile, "k_inputs[(i+%s)*NUMTHREAD+tid]", var);
     else fprintf(fpOutputFile, "inputs[i+%s][0]", var);
-  
+
  }
 	YY_BREAK
 case 55:
@@ -4374,7 +4392,7 @@ YY_RULE_SETUP
 #line 723 "compiler/EaseaLex.l"
 {
   if( bIsCopyingGPEval )
-    fprintf(fpOutputFile,"return fitness = "); 
+    fprintf(fpOutputFile,"return fitness = ");
  }
 	YY_BREAK
 case 58:
@@ -4470,14 +4488,14 @@ YY_RULE_SETUP
   size_t size_of_genome=0;
   if (bVERBOSE) printf ("Inserting default genome size.\n");
   if( !genomeSizeValidity ){
-    if (bVERBOSE) printf ("\tComputing default genome size.\n");  
+    if (bVERBOSE) printf ("\tComputing default genome size.\n");
     CListItem<CSymbol*> *pSym;
     pGENOME->pSymbolList->reset();
     while (pSym=pGENOME->pSymbolList->walkToNextItem()){
       //DEBUG_PRT_PRT("%s has size : %lu",pSym->Object->sName,pSym->Object->nSize);
       size_of_genome+=pSym->Object->nSize;
     }
-    //DEBUG_PRT_PRT("Total genome size is %lu",size_of_genome); 
+    //DEBUG_PRT_PRT("Total genome size is %lu",size_of_genome);
     genomeSize = size_of_genome;
     genomeSizeValidity=true;
   }
@@ -4503,7 +4521,7 @@ YY_RULE_SETUP
       fprintf(fpOutputFile,"    %s=NULL;\n",pSym->Object->sName);
     }
   }
-  
+
  }
 	YY_BREAK
 /* <TEMPLATE_ANALYSIS>"\\GENOME_CUDA_MOTION" { */
@@ -4527,7 +4545,7 @@ YY_RULE_SETUP
 case 66:
 YY_RULE_SETUP
 #line 858 "compiler/EaseaLex.l"
-{        
+{
   if (pGENOME->sString) {
     if (bVERBOSE) printf ("Inserting Methods into Genome Class.\n");
     fprintf(fpOutputFile,"// User-defined methods:\n\n");
@@ -4535,7 +4553,7 @@ YY_RULE_SETUP
   }
   if (bVERBOSE) printf ("Inserting genome.\n");
   pGENOME->print(fpOutputFile);
- }                                            
+ }
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
@@ -4543,8 +4561,8 @@ YY_RULE_SETUP
 {
   CListItem<CSymbol*> *pSym;
   if (bVERBOSE) printf ("Creating default assignment constructor.\n");
-  fprintf (fpOutputFile,"// Memberwise assignment\n");             
-  pGENOME->pSymbolList->reset();                                      
+  fprintf (fpOutputFile,"// Memberwise assignment\n");
+  pGENOME->pSymbolList->reset();
   while (pSym=pGENOME->pSymbolList->walkToNextItem()){
     if (pSym->Object->ObjectQualifier==1) continue; // 1=Static
     if (pSym->Object->ObjectType==oObject)
@@ -4564,7 +4582,7 @@ YY_RULE_SETUP
 {
   CListItem<CSymbol*> *pSym;
   if (bVERBOSE) printf ("Creating default clone method.\n");
-  fprintf (fpOutputFile,"// Memberwise Cloning\n");             
+  fprintf (fpOutputFile,"// Memberwise Cloning\n");
   pGENOME->pSymbolList->reset();
   while (pSym=pGENOME->pSymbolList->walkToNextItem()){
     if (pSym->Object->ObjectQualifier==1) continue; // 1=Static
@@ -4585,27 +4603,27 @@ YY_RULE_SETUP
 {
   CListItem<CSymbol*> *pSym;
   if (bVERBOSE) printf ("Creating default copy constructor.\n");
-  fprintf (fpOutputFile,"// Memberwise copy\n");             
+  fprintf (fpOutputFile,"// Memberwise copy\n");
   pGENOME->pSymbolList->reset();
   while (pSym=pGENOME->pSymbolList->walkToNextItem()){
     if (pSym->Object->ObjectQualifier==1) continue; // 1=Static
       if (pSym->Object->ObjectType==oObject)
 	fprintf(fpOutputFile,"    %s=genome.%s;\n",pSym->Object->sName,pSym->Object->sName);
       if (pSym->Object->ObjectType==oPointer)
-	fprintf(fpOutputFile,"    %s=(genome.%s ? new %s(*(genome.%s)) : NULL);\n",pSym->Object->sName,pSym->Object->sName,pSym->Object->pType->sName,pSym->Object->sName);
+	fprintf(fpOutputFile,"    %s=(genome.%s ? genome.%s->clone() : NULL);\n",pSym->Object->sName,pSym->Object->sName,pSym->Object->sName);
       if (pSym->Object->ObjectType==oArray){
 	fprintf(fpOutputFile,"    {for(int EASEA_Ndx=0; EASEA_Ndx<%d; EASEA_Ndx++)\n",pSym->Object->nSize/pSym->Object->pType->nSize);
 	fprintf(fpOutputFile,"       %s[EASEA_Ndx]=genome.%s[EASEA_Ndx];}\n",pSym->Object->sName,pSym->Object->sName);
       }
-      else if( pSym->Object->ObjectType==oArrayPointer ){ 
+      else if( pSym->Object->ObjectType==oArrayPointer ){
 	// here we handle array of pointer (developped for Tree GP)
 	fprintf(fpOutputFile,"    for(int EASEA_Ndx=0; EASEA_Ndx<%d; EASEA_Ndx++)\n",pSym->Object->nSize/sizeof(char*));
 	fprintf(fpOutputFile,"      if(genome.%s[EASEA_Ndx]) %s[EASEA_Ndx] = new %s(*(genome.%s[EASEA_Ndx]));\n",pSym->Object->sName,
 		pSym->Object->sName,pSym->Object->pType->sName,pSym->Object->sName);
 	fprintf(fpOutputFile,"      else %s[EASEA_Ndx] = NULL;\n",pSym->Object->sName);
-	
+
       }
-      
+
   }
  }
 	YY_BREAK
@@ -4638,7 +4656,7 @@ YY_RULE_SETUP
 {
   CListItem<CSymbol*> *pSym;
   if (bVERBOSE) printf ("Creating default copy constructor.\n");
-  fprintf (fpOutputFile,"// Memberwise copy\n");             
+  fprintf (fpOutputFile,"// Memberwise copy\n");
   pGENOME->pSymbolList->reset();
   while (pSym=pGENOME->pSymbolList->walkToNextItem()){
     if (pSym->Object->ObjectQualifier==1) continue; // 1=Static
@@ -4657,13 +4675,13 @@ YY_RULE_SETUP
 {
   CListItem<CSymbol*> *pSym;
   if (bVERBOSE) printf ("Creating default destructor.\n");
-  fprintf (fpOutputFile,"// Destructing pointers\n");             
+  fprintf (fpOutputFile,"// Destructing pointers\n");
   pGENOME->pSymbolList->reset();
   while (pSym=pGENOME->pSymbolList->walkToNextItem()){
     if (pSym->Object->ObjectType==oPointer){
       fprintf(fpOutputFile,"  if (%s) delete %s;\n  %s=NULL;\n",pSym->Object->sName,pSym->Object->sName,pSym->Object->sName);
     }
-    else if( pSym->Object->ObjectType==oArrayPointer ){ 
+    else if( pSym->Object->ObjectType==oArrayPointer ){
       // here we handle array of pointer (developped for Tree GP)
       fprintf(fpOutputFile,"    for(int EASEA_Ndx=0; EASEA_Ndx<%d; EASEA_Ndx++)\n",pSym->Object->nSize/sizeof(char*));
       fprintf(fpOutputFile,"      if(%s[EASEA_Ndx]) delete %s[EASEA_Ndx];\n",pSym->Object->sName,pSym->Object->sName,pSym->Object->pType->sName,pSym->Object->sName);
@@ -4674,10 +4692,10 @@ YY_RULE_SETUP
 case 74:
 YY_RULE_SETUP
 #line 979 "compiler/EaseaLex.l"
-{       
+{
   CListItem<CSymbol*> *pSym;
   if (bVERBOSE) printf ("Creating default diversity test.\n");
-  fprintf (fpOutputFile,"// Default diversity test (required by GALib)\n");             
+  fprintf (fpOutputFile,"// Default diversity test (required by GALib)\n");
   pGENOME->pSymbolList->reset();
   while (pSym=pGENOME->pSymbolList->walkToNextItem()) {
     if (pSym->Object->ObjectType==oObject)
@@ -4688,12 +4706,12 @@ YY_RULE_SETUP
       fprintf(fpOutputFile,"  {for(int EASEA_Ndx=0; EASEA_Ndx<%d; EASEA_Ndx++)\n",pSym->Object->nSize/pSym->Object->pType->nSize);
       fprintf(fpOutputFile,"     if (%s[EASEA_Ndx]!=genome.%s[EASEA_Ndx]) return 0;}\n",pSym->Object->sName,pSym->Object->sName);
     }
-    else if( pSym->Object->ObjectType==oArrayPointer ){ 
+    else if( pSym->Object->ObjectType==oArrayPointer ){
       // here we handle array of pointer (developped for Tree GP)
       fprintf(fpOutputFile,"    for(int EASEA_Ndx=0; EASEA_Ndx<%d; EASEA_Ndx++)\n",pSym->Object->nSize/sizeof(char*));
       fprintf(fpOutputFile,"      if(%s[EASEA_Ndx] != genome.%s[EASEA_Ndx]) return 0;\n",pSym->Object->sName,pSym->Object->sName,pSym->Object->pType->sName,pSym->Object->sName);
     }
-    
+
   }
  }
 	YY_BREAK
@@ -4703,7 +4721,7 @@ YY_RULE_SETUP
 {
   CListItem<CSymbol*> *pSym;
   if (bVERBOSE) printf ("Creating default genome comparator.\n");
-  fprintf (fpOutputFile,"// Default genome comparator (required by GALib)\n");             
+  fprintf (fpOutputFile,"// Default genome comparator (required by GALib)\n");
   pGENOME->pSymbolList->reset();
   while (pSym=pGENOME->pSymbolList->walkToNextItem()) {
     if (pSym->Object->ObjectType==oObject)
@@ -4723,7 +4741,7 @@ YY_RULE_SETUP
 {
   CListItem<CSymbol*> *pSym;
   if (bVERBOSE) printf ("Creating default read command.\n");
-  fprintf (fpOutputFile,"// Default read command\n");             
+  fprintf (fpOutputFile,"// Default read command\n");
   pGENOME->pSymbolList->reset();
   while (pSym=pGENOME->pSymbolList->walkToNextItem()){
     if (pSym->Object->ObjectQualifier==1) continue; // 1=Static
@@ -4733,11 +4751,11 @@ YY_RULE_SETUP
 case 77:
 YY_RULE_SETUP
 #line 1026 "compiler/EaseaLex.l"
-{        
+{
   if (bVERBOSE) printf ("Inserting genome display function.\n");
   yyin = fpGenomeFile;                                                     // switch to .ez file and analyser
   yypush_buffer_state(yy_create_buffer(yyin,YY_BUF_SIZE ));
-  BEGIN COPY_DISPLAY;   
+  BEGIN COPY_DISPLAY;
  }
 	YY_BREAK
 case 78:
@@ -4771,20 +4789,20 @@ YY_RULE_SETUP
 	  if (bDisplayFunction) printf("//");
 	  if (bDisplayFunction) printf("//");
 	  fprintf(fpOutputFile,"  os << \"\\n\";\n",pSym->Object->sName);
-	}         
+	}
 	if (pSym->Object->ObjectType==oPointer){
 	  if (bDisplayFunction) printf("//");
 	}
     }
-  }                      
- }    
+  }
+ }
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
 #line 1066 "compiler/EaseaLex.l"
 {
   if (bVERBOSE) printf ("Inserting user functions.\n");
-  yyin = fpGenomeFile;                    
+  yyin = fpGenomeFile;
   yypush_buffer_state(yy_create_buffer(yyin,YY_BUF_SIZE ));
   lineCounter=2;                                 // switch to .ez file and analyser
   BEGIN COPY_USER_FUNCTIONS;
@@ -4793,7 +4811,7 @@ YY_RULE_SETUP
 case 81:
 YY_RULE_SETUP
 #line 1073 "compiler/EaseaLex.l"
-{        
+{
   bWithinEO_Function=1;
   lineCounter=1;
   if( TARGET==CUDA || TARGET==STD) bWithinCUDA_Initializer = 1;
@@ -4805,11 +4823,11 @@ YY_RULE_SETUP
 case 82:
 YY_RULE_SETUP
 #line 1082 "compiler/EaseaLex.l"
-{        
+{
   yyin = fpGenomeFile;                                                     // switch to .ez file and analyser
   yypush_buffer_state(yy_create_buffer(yyin,YY_BUF_SIZE ));
   lineCounter = 1;
-  BEGIN COPY_INITIALISER;   
+  BEGIN COPY_INITIALISER;
  }
 	YY_BREAK
 case 83:
@@ -4826,21 +4844,21 @@ YY_RULE_SETUP
 case 84:
 YY_RULE_SETUP
 #line 1097 "compiler/EaseaLex.l"
-{        
+{
   yyin = fpGenomeFile;                                                     // switch to .ez file and analyser
   yypush_buffer_state(yy_create_buffer(yyin,YY_BUF_SIZE ));
   lineCounter=1;
-  BEGIN COPY_CROSSOVER;   
+  BEGIN COPY_CROSSOVER;
  }
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
 #line 1103 "compiler/EaseaLex.l"
-{        
+{
   yyin = fpGenomeFile;                                                     // switch to .ez file and analyser
   yypush_buffer_state(yy_create_buffer(yyin,YY_BUF_SIZE ));
   lineCounter=1;
-  BEGIN COPY_MUTATOR;   
+  BEGIN COPY_MUTATOR;
  }
 	YY_BREAK
 case 86:
@@ -4850,24 +4868,24 @@ YY_RULE_SETUP
   yyin = fpGenomeFile;                                                     // switch to .ez file and analyser
   yypush_buffer_state(yy_create_buffer(yyin,YY_BUF_SIZE ));
   lineCounter=1;
-  BEGIN COPY_EVALUATOR;   
+  BEGIN COPY_EVALUATOR;
  }
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
 #line 1115 "compiler/EaseaLex.l"
-{      
+{
   if( bVERBOSE ) fprintf(stdout,"Inserting optimization function\n");
   yyin = fpGenomeFile;                                                     // switch to .ez file and analyser
   yypush_buffer_state(yy_create_buffer(yyin,YY_BUF_SIZE ));
   lineCounter=1;
-  BEGIN COPY_OPTIMISER;   
+  BEGIN COPY_OPTIMISER;
  }
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
 #line 1122 "compiler/EaseaLex.l"
-{        
+{
   yyin = fpGenomeFile;                                                     // switch to .ez file and analyser
   yypush_buffer_state(yy_create_buffer(yyin,YY_BUF_SIZE ));
   bWithinCUDA_Evaluator = 1;
@@ -4878,7 +4896,7 @@ YY_RULE_SETUP
 case 89:
 YY_RULE_SETUP
 #line 1129 "compiler/EaseaLex.l"
-{ 
+{
   if( bVERBOSE ) fprintf(stdout,"Inserting cuda optimization function\n");
   yyin = fpGenomeFile;                                                     // switch to .ez file and analyser
   yypush_buffer_state(yy_create_buffer(yyin,YY_BUF_SIZE ));
@@ -4890,10 +4908,10 @@ YY_RULE_SETUP
 case 90:
 YY_RULE_SETUP
 #line 1138 "compiler/EaseaLex.l"
-{        
+{
   yyin = fpGenomeFile;                                                     // switch to .ez file and analyser
   yypush_buffer_state(yy_create_buffer(yyin,YY_BUF_SIZE ));
-  BEGIN PARAMETERS_ANALYSIS;   
+  BEGIN PARAMETERS_ANALYSIS;
  }
 	YY_BREAK
 case 91:
@@ -4906,7 +4924,7 @@ YY_RULE_SETUP
       fprintf(fpOutputFile,"\n\tEASEAGenerationFunction(this);");
     }
   }
- }     
+ }
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
@@ -4918,7 +4936,7 @@ YY_RULE_SETUP
       fprintf(fpOutputFile,"\n\tEASEAEndGenerationFunction(this);");
     }
   }
- }     
+ }
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
@@ -4930,7 +4948,7 @@ YY_RULE_SETUP
       fprintf(fpOutputFile,"\n\tEASEABeginningGenerationFunction(this);");
     }
   }
- }     
+ }
 	YY_BREAK
 case 94:
 YY_RULE_SETUP
@@ -4941,7 +4959,7 @@ YY_RULE_SETUP
       fprintf(fpOutputFile,"\n\tEASEABoundChecking(this);");
     }
   }
- }        
+ }
 	YY_BREAK
 case 95:
 YY_RULE_SETUP
@@ -4969,7 +4987,7 @@ YY_RULE_SETUP
 #line 1191 "compiler/EaseaLex.l"
 {
   if (bFinalizationFunction) fprintf(fpOutputFile,"\n  EASEAFinalization(pop);\n");
- }        
+ }
 	YY_BREAK
 case 99:
 YY_RULE_SETUP
@@ -4977,7 +4995,7 @@ YY_RULE_SETUP
 {
   //DEBUG_PRT_PRT("Inserting user classe definitions");
   pGENOME->printUserClasses(fpOutputFile);
- }        
+ }
 	YY_BREAK
 case 100:
 YY_RULE_SETUP
@@ -4989,7 +5007,7 @@ YY_RULE_SETUP
     if( !selectorClass ){
       fprintf(stderr,"Error %d : selection operator %s doesn't exist in CUDA/STD template\n",yylineno,sSELECTOR);
       return -1;
-    }    
+    }
     //DEBUG_PRT_PRT("Created class is %s",selectorClass);
     fprintf(fpOutputFile,"%s",selectorClass);
   }
@@ -5066,7 +5084,7 @@ YY_RULE_SETUP
     if( !selectorClass ){
       fprintf(stderr,"Error %d : selection operator %s doesn't exist in CUDA/STD template\n",yylineno,sSELECTOR);
       return -1;
-    }    
+    }
     //DEBUG_PRT_PRT("Created class is %s",selectorClass);
     fprintf(fpOutputFile,"%s",selectorClass);
   }
@@ -5083,7 +5101,7 @@ YY_RULE_SETUP
     if( !selectorClass ){
       fprintf(stderr,"Error %d : selection operator %s doesn't exist in CUDA/STD template\n",yylineno,sSELECTOR);
       return -1;
-    }    
+    }
     //DEBUG_PRT_PRT("Created class is %s",selectorClass);
     fprintf(fpOutputFile,"%s",selectorClass);
   }
@@ -5100,7 +5118,7 @@ YY_RULE_SETUP
     if( !selectorClass ){
       fprintf(stderr,"Error %d : replacement operator %s doesn't exist in CUDA/TPL template\n",yylineno,sRED_FINAL);
       return -1;
-    }    
+    }
     //DEBUG_PRT_PRT("Created class is %s",selectorClass);
     fprintf(fpOutputFile,"%s",selectorClass);
   }
@@ -5238,7 +5256,7 @@ YY_RULE_SETUP
   fclose(fpOutputFile);
   strcpy(sFileName, sRAW_PROJECT_NAME);
   strcat(sFileName,"Individual.hpp");
-  fpOutputFile=fopen(sFileName,"w");    
+  fpOutputFile=fopen(sFileName,"w");
   if (bVERBOSE) printf("Creating %s...\n",sFileName);
  }
 	YY_BREAK
@@ -5253,7 +5271,7 @@ YY_RULE_SETUP
     strcat(sFileName,"Individual.cu");
   else if( TARGET==STD )
     strcat(sFileName,"Individual.cpp");
-  fpOutputFile=fopen(sFileName,"w");    
+  fpOutputFile=fopen(sFileName,"w");
   if (bVERBOSE) printf("Creating %s...\n",sFileName);
  }
 	YY_BREAK
@@ -5315,7 +5333,7 @@ YY_RULE_SETUP
     // add "Makefile" at the end of path
     //char* cdn = get_current_dir_name();
     char cdn[4096];
-    #ifdef WIN32 
+    #ifdef WIN32
     _getcwd(cdn,4096);
     #else
     getcwd(cdn,4096);
@@ -5324,14 +5342,14 @@ YY_RULE_SETUP
     strcpy(sFullFileName,cdn);
     strcat(sFullFileName,"/\0");
     strcat(sFullFileName,sFileName);
-    
+
     strncpy(sPathName,sRAW_PROJECT_NAME,fileNameLength);
     strcpy(sPathName+fileNameLength,"/Makefile");
-    
+
     //DEBUG_PRT_PRT("PathName is %s",sPathName);
     //DEBUG_PRT_PRT("FullFileName is %s",sFullFileName);
-    
-  
+
+
     // create a symbolic link from Makefile to EASEA.mak
 #ifndef WIN32
     symlink(sFullFileName,sPathName);
@@ -5374,7 +5392,7 @@ case 147:
 /* rule 147 can match eol */
 YY_RULE_SETUP
 #line 1413 "compiler/EaseaLex.l"
-{putc(yytext[0],fpOutputFile);}                                      
+{putc(yytext[0],fpOutputFile);}
 	YY_BREAK
 /****************************************
  *  use information found in .ez file
@@ -5384,11 +5402,11 @@ case 148:
 YY_RULE_SETUP
 #line 1419 "compiler/EaseaLex.l"
 {
-  fprintf (fpOutputFile,"// Genome Initialiser\n"); 
+  fprintf (fpOutputFile,"// Genome Initialiser\n");
   if( bLINE_NUM_EZ_FILE )
     fprintf(fpOutputFile,"#line %d \"%s.ez\"\n",lineCounter, sRAW_PROJECT_NAME);
   BEGIN COPY;
- }                                                               
+ }
 	YY_BREAK
 case YY_STATE_EOF(COPY_EO_INITIALISER):
 #line 1425 "compiler/EaseaLex.l"
@@ -5404,7 +5422,7 @@ case YY_STATE_EOF(COPY_EO_INITIALISER):
 case 149:
 YY_RULE_SETUP
 #line 1433 "compiler/EaseaLex.l"
-{}                                      
+{}
 	YY_BREAK
 case 150:
 /* rule 150 can match eol */
@@ -5417,11 +5435,11 @@ case 151:
 YY_RULE_SETUP
 #line 1436 "compiler/EaseaLex.l"
 {
-  fprintf (fpOutputFile,"// User declarations\n"); 
+  fprintf (fpOutputFile,"// User declarations\n");
   if( bLINE_NUM_EZ_FILE )
     fprintf(fpOutputFile,"#line %d \"%s.ez\"\n",lineCounter, sRAW_PROJECT_NAME);
   BEGIN COPY;
- }                                                               
+ }
 	YY_BREAK
 case YY_STATE_EOF(COPY_USER_DECLARATIONS):
 #line 1442 "compiler/EaseaLex.l"
@@ -5445,18 +5463,18 @@ YY_RULE_SETUP
 #line 1452 "compiler/EaseaLex.l"
 {
   lineCounter++;
- } 
+ }
 	YY_BREAK
 case 154:
 /* rule 154 can match eol */
 YY_RULE_SETUP
 #line 1456 "compiler/EaseaLex.l"
 {
-  fprintf (fpOutputFile,"// User CUDA\n"); 
+  fprintf (fpOutputFile,"// User CUDA\n");
   if( bLINE_NUM_EZ_FILE )
     fprintf(fpOutputFile,"#line %d \"%s.ez\"\n",lineCounter, sRAW_PROJECT_NAME);
   BEGIN COPY;
- }                                                               
+ }
 	YY_BREAK
 case YY_STATE_EOF(COPY_USER_CUDA):
 #line 1462 "compiler/EaseaLex.l"
@@ -5480,18 +5498,18 @@ YY_RULE_SETUP
 #line 1472 "compiler/EaseaLex.l"
 {
   lineCounter++;
- }                
+ }
 	YY_BREAK
 case 157:
 /* rule 157 can match eol */
 YY_RULE_SETUP
 #line 1476 "compiler/EaseaLex.l"
 {
-  fprintf (fpOutputFile,"// User functions\n\n"); 
+  fprintf (fpOutputFile,"// User functions\n\n");
   if( bLINE_NUM_EZ_FILE )
     fprintf(fpOutputFile,"#line %d \"%s.ez\"\n",lineCounter, sRAW_PROJECT_NAME);
   BEGIN COPY;
- }                                                               
+ }
 	YY_BREAK
 case YY_STATE_EOF(COPY_USER_FUNCTIONS):
 #line 1482 "compiler/EaseaLex.l"
@@ -5508,7 +5526,7 @@ case YY_STATE_EOF(COPY_USER_FUNCTIONS):
 case 158:
 YY_RULE_SETUP
 #line 1491 "compiler/EaseaLex.l"
-{}                                      
+{}
 	YY_BREAK
 case 159:
 /* rule 159 can match eol */
@@ -5527,7 +5545,7 @@ YY_RULE_SETUP
   bFunction=1; bInitFunction=1;
   if( bLINE_NUM_EZ_FILE )
     fprintf(fpOutputFile,"#line %d \"%s.ez\"\n",lineCounter, sRAW_PROJECT_NAME);
-      
+
   BEGIN COPY;
  }
 	YY_BREAK
@@ -5547,13 +5565,13 @@ case YY_STATE_EOF(COPY_INITIALISATION_FUNCTION):
 case 161:
 YY_RULE_SETUP
 #line 1514 "compiler/EaseaLex.l"
-{}                                      
+{}
 	YY_BREAK
 case 162:
 /* rule 162 can match eol */
 YY_RULE_SETUP
 #line 1515 "compiler/EaseaLex.l"
-{lineCounter++;} 
+{lineCounter++;}
 	YY_BREAK
 /****************************************
  *  Easea GPGPU & EO Finalization function
@@ -5586,13 +5604,13 @@ case YY_STATE_EOF(COPY_FINALIZATION_FUNCTION):
 case 164:
 YY_RULE_SETUP
 #line 1539 "compiler/EaseaLex.l"
-{}                                      
+{}
 	YY_BREAK
 case 165:
 /* rule 165 can match eol */
 YY_RULE_SETUP
 #line 1540 "compiler/EaseaLex.l"
-{lineCounter++;}                                      
+{lineCounter++;}
 	YY_BREAK
 case 166:
 /* rule 166 can match eol */
@@ -5603,7 +5621,7 @@ YY_RULE_SETUP
   if( (TARGET==CUDA || TARGET==STD)  ){
     fprintf (fpOutputFile,"{\n");
     //fprintf (fpOutputFile,"// Function called at each new generation\nvoid EASEAEndGenerationFunction(EvolutionaryAlgorithm* evolutionaryAlgorithm){\n");
-    bFunction=1; 
+    bFunction=1;
     bEndGenerationFunction = 1;
     BEGIN COPY_USER_GENERATION;
   }
@@ -5627,7 +5645,7 @@ case 167:
 /* rule 167 can match eol */
 YY_RULE_SETUP
 #line 1565 "compiler/EaseaLex.l"
-{}                                      
+{}
 	YY_BREAK
 case 168:
 /* rule 168 can match eol */
@@ -5665,13 +5683,13 @@ YY_RULE_SETUP
 case 170:
 YY_RULE_SETUP
 #line 1593 "compiler/EaseaLex.l"
-{}                                      
+{}
 	YY_BREAK
 case 171:
 /* rule 171 can match eol */
 YY_RULE_SETUP
 #line 1594 "compiler/EaseaLex.l"
-{lineCounter++;}                                      
+{lineCounter++;}
 	YY_BREAK
 case YY_STATE_EOF(COPY_INSTEAD_EVAL):
 #line 1596 "compiler/EaseaLex.l"
@@ -5721,7 +5739,7 @@ YY_RULE_SETUP
   if((TARGET==CUDA || TARGET==STD) /* && !bBeginGeneration && !bEndGeneration ) */)
   {
       fprintf (fpOutputFile,"{\n");
-      bFunction=1; 
+      bFunction=1;
       bGenerationReplacementFunction=1;
       BEGIN COPY_USER_GENERATION;
   }
@@ -5780,7 +5798,7 @@ case 178:
 /* rule 178 can match eol */
 YY_RULE_SETUP
 #line 1671 "compiler/EaseaLex.l"
-{}                                      
+{}
 	YY_BREAK
 case 179:
 /* rule 179 can match eol */
@@ -5793,7 +5811,7 @@ case 180:
 /* rule 180 can match eol */
 YY_RULE_SETUP
 #line 1677 "compiler/EaseaLex.l"
-{}                                      
+{}
 	YY_BREAK
 /****************************************
   *  Basic copy to cpp file with minor changes
@@ -5825,6 +5843,7 @@ YY_RULE_SETUP
 case 185:
 /* rule 185 can match eol */
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
+YY_LINENO_REWIND_TO(yy_bp + 6);
 (yy_c_buf_p) = yy_cp = yy_bp + 6;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
@@ -5844,14 +5863,14 @@ case 187:
 YY_RULE_SETUP
 #line 1695 "compiler/EaseaLex.l"
 {
-  if (bDoubleQuotes) 
+  if (bDoubleQuotes)
     fprintf(fpOutputFile,"MUT_PROB");
   else
     if( TARGET==STD || TARGET==CUDA){
       fprintf(fpOutputFile,"(*pEZ_MUT_PROB)");
     }
     else fprintf(fpOutputFile,"EZ_MUT_PROB");
-  
+
  } // local genome name
 	YY_BREAK
 case 188:
@@ -5859,7 +5878,7 @@ case 188:
 YY_RULE_SETUP
 #line 1705 "compiler/EaseaLex.l"
 {
-  if (bDoubleQuotes) 
+  if (bDoubleQuotes)
     fprintf(fpOutputFile,"XOVER_PROB");
   else if( TARGET==CUDA || TARGET==STD )
     fprintf(fpOutputFile,"(*pEZ_XOVER_PROB)");
@@ -5933,7 +5952,7 @@ case 198:
 YY_RULE_SETUP
 #line 1732 "compiler/EaseaLex.l"
 {
-  fprintf(stderr,"\n%s - Error line %d: The mutation probability can only be changed within the generation function.\n",sEZ_FILE_NAME,yylineno); 
+  fprintf(stderr,"\n%s - Error line %d: The mutation probability can only be changed within the generation function.\n",sEZ_FILE_NAME,yylineno);
   exit (1);
 }
 	YY_BREAK
@@ -5993,7 +6012,7 @@ YY_RULE_SETUP
 case 208:
 YY_RULE_SETUP
 #line 1747 "compiler/EaseaLex.l"
-{ // local random name 
+{ // local random name
   fprintf(fpOutputFile,"globalRandomGenerator->tossCoin");}
 	YY_BREAK
 case 209:
@@ -6018,7 +6037,7 @@ YY_RULE_SETUP
 case 212:
 YY_RULE_SETUP
 #line 1756 "compiler/EaseaLex.l"
-{fprintf(fpOutputFile,"%s",yytext); BEGIN MACRO_IDENTIFIER;} 
+{fprintf(fpOutputFile,"%s",yytext); BEGIN MACRO_IDENTIFIER;}
 	YY_BREAK
 case 213:
 YY_RULE_SETUP
@@ -6027,7 +6046,7 @@ YY_RULE_SETUP
   int i;
   for (i=0;(yytext[i]!=' ')&&(yytext[i]!=' ');i++);
   yytext[i]=0;
-  fprintf(fpOutputFile,"template <class fitT> %s %sGenome<fitT>::",yytext,sPROJECT_NAME);}         
+  fprintf(fpOutputFile,"template <class fitT> %s %sGenome<fitT>::",yytext,sPROJECT_NAME);}
 	YY_BREAK
 case 214:
 YY_RULE_SETUP
@@ -6082,13 +6101,13 @@ YY_RULE_SETUP
 #line 1786 "compiler/EaseaLex.l"
 {
   if (bFunction==1 && bWithinCUDA_Initializer==0) {
-    fprintf (fpOutputFile,"}\n"); 
+    fprintf (fpOutputFile,"}\n");
     bFunction=0;
     bWithinCUDA_Initializer=0;
   }
   bWithinEO_Function=0;
-  rewind(fpGenomeFile); 
-  yyin = fpTemplateFile; 
+  rewind(fpGenomeFile);
+  yyin = fpTemplateFile;
   yypop_buffer_state();
   BEGIN TEMPLATE_ANALYSIS;} // Back to the template file
 	YY_BREAK
@@ -6096,7 +6115,7 @@ case 221:
 /* rule 221 can match eol */
 YY_RULE_SETUP
 #line 1797 "compiler/EaseaLex.l"
-{putc(yytext[0],fpOutputFile);}                                      
+{putc(yytext[0],fpOutputFile);}
 	YY_BREAK
 /* Looking for an identifier */
 case 222:
@@ -6143,7 +6162,7 @@ YY_RULE_SETUP
   BEGIN COPY;}
 	YY_BREAK
 /*If no number was found, we're not interested*/
-/* old rule : <MACRO_DEFINITION>\/.|\n 
+/* old rule : <MACRO_DEFINITION>\/.|\n
    * I don't understand why there is a "\/"...
    */
 case 227:
@@ -6164,7 +6183,7 @@ YY_RULE_SETUP
 case 228:
 YY_RULE_SETUP
 #line 1842 "compiler/EaseaLex.l"
-;         
+;
 	YY_BREAK
 /*blah blah on its own on a single line*/
 case 229:
@@ -6178,7 +6197,7 @@ case 230:
 /* rule 230 can match eol */
 YY_RULE_SETUP
 #line 1846 "compiler/EaseaLex.l"
-;  
+;
 	YY_BREAK
 /* blah blah with nothing before the comment */
 case 231:
@@ -6271,13 +6290,13 @@ YY_RULE_SETUP
 case 245:
 YY_RULE_SETUP
 #line 1880 "compiler/EaseaLex.l"
-{return GENOME; }                         
+{return GENOME; }
 	YY_BREAK
 case 246:
 YY_RULE_SETUP
 #line 1882 "compiler/EaseaLex.l"
 {BEGIN GET_METHODS;
-  yylval.szString=yytext;  
+  yylval.szString=yytext;
   bMethodsInGenome=1;
   return METHODS;}
 	YY_BREAK
@@ -6312,7 +6331,7 @@ case 251:
 /* rule 251 can match eol */
 YY_RULE_SETUP
 #line 1899 "compiler/EaseaLex.l"
-{ 
+{
  /*   //DEBUG_PRT_PRT("Display function is at %d line in %s.ez",yylineno,sRAW_PROJECT_NAME); */
  /*   fprintf(fpOutputFile,"\n#line %d \"%s.ez\"\n",yylineno,sRAW_PROJECT_NAME); */
   bDisplayFunction=bWithinDisplayFunction=1;
@@ -6336,20 +6355,20 @@ case 252:
 /* rule 252 can match eol */
 YY_RULE_SETUP
 #line 1915 "compiler/EaseaLex.l"
-{/*putc(yytext[0],fpOutputFile);*/}                                      
+{/*putc(yytext[0],fpOutputFile);*/}
 	YY_BREAK
 case 253:
 /* rule 253 can match eol */
 YY_RULE_SETUP
 #line 1917 "compiler/EaseaLex.l"
 {
-  //DEBUG_PRT_PRT("LDFLAGS is beg: %s",yytext); 
+  //DEBUG_PRT_PRT("LDFLAGS is beg: %s",yytext);
   bWithinMAKEFILEOPTION=1;
   return MAKEFILE_OPTION;
  }
 	YY_BREAK
 /****************************************
-  * Looks for Makefile options (like 
+  * Looks for Makefile options (like
   * LDFLAGS+= or CPPFLAGS...)
   ****************************************/
 case 254:
@@ -6384,7 +6403,7 @@ YY_RULE_SETUP
  */
 case YY_STATE_EOF(COPY_MAKEFILE_OPTION):
 #line 1953 "compiler/EaseaLex.l"
-{ 
+{
   //DEBUG_PRT_PRT("No makefile options defined.");
 
   yyin = fpTemplateFile;
@@ -6413,7 +6432,7 @@ case 257:
 /* rule 257 can match eol */
 YY_RULE_SETUP
 #line 1973 "compiler/EaseaLex.l"
-{/*putc(yytext[0],fpOutputFile);*/}                                      
+{/*putc(yytext[0],fpOutputFile);*/}
 	YY_BREAK
 case 258:
 /* rule 258 can match eol */
@@ -6466,7 +6485,7 @@ case 264:
 YY_RULE_SETUP
 #line 1993 "compiler/EaseaLex.l"
 {
-  BEGIN COPY_USER_FUNCTION;            
+  BEGIN COPY_USER_FUNCTION;
   bWithinEvaluator=1;
   if( bLINE_NUM_EZ_FILE )
     fprintf(fpOutputFile,"#line %d \"%s.ez\"\n",lineCounter, sRAW_PROJECT_NAME);
@@ -6521,7 +6540,7 @@ case 271:
 /* rule 271 can match eol */
 YY_RULE_SETUP
 #line 2021 "compiler/EaseaLex.l"
-{fprintf(fpOutputFile,yytext);} 
+{fprintf(fpOutputFile,yytext);}
 	YY_BREAK
 /* blah blah on a line containing sth else */
 case 272:
@@ -6566,7 +6585,7 @@ YY_RULE_SETUP
 {
   if (!bWaitingToClosePopulation) fprintf(fpOutputFile,"]");
   else {
-    fprintf(fpOutputFile,"])"); 
+    fprintf(fpOutputFile,"])");
     bWaitingToClosePopulation=false;
   }
  }
@@ -6582,6 +6601,7 @@ YY_RULE_SETUP
 case 280:
 /* rule 280 can match eol */
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
+YY_LINENO_REWIND_TO(yy_bp + 17);
 (yy_c_buf_p) = yy_cp = yy_bp + 17;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
@@ -6596,18 +6616,19 @@ YY_RULE_SETUP
 #line 2050 "compiler/EaseaLex.l"
 {if (bDoubleQuotes) fprintf(fpOutputFile,"NB_GEN");
  /*local genome name*/
-  else {fprintf(fpOutputFile,"(*EZ_NB_GEN)"); }} 
+  else {fprintf(fpOutputFile,"(*EZ_NB_GEN)"); }}
 	YY_BREAK
 case 282:
 /* rule 282 can match eol */
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
+YY_LINENO_REWIND_TO(yy_bp + 6);
 (yy_c_buf_p) = yy_cp = yy_bp + 6;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
 #line 2053 "compiler/EaseaLex.l"
 {if (bDoubleQuotes) fprintf(fpOutputFile,"NB_GEN");
  /*local genome name*/
-  else {fprintf(fpOutputFile,"(*EZ_NB_GEN)"); }} 
+  else {fprintf(fpOutputFile,"(*EZ_NB_GEN)"); }}
 	YY_BREAK
 case 283:
 YY_RULE_SETUP
@@ -6618,6 +6639,7 @@ YY_RULE_SETUP
 case 284:
 /* rule 284 can match eol */
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
+YY_LINENO_REWIND_TO(yy_bp + 8);
 (yy_c_buf_p) = yy_cp = yy_bp + 8;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
@@ -6637,6 +6659,7 @@ YY_RULE_SETUP
 case 286:
 /* rule 286 can match eol */
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
+YY_LINENO_REWIND_TO(yy_bp + 8);
 (yy_c_buf_p) = yy_cp = yy_bp + 8;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
@@ -6653,7 +6676,7 @@ YY_RULE_SETUP
 {
   if (bDoubleQuotes) fprintf(fpOutputFile,"XOVER_PROB");
   else {
-      fprintf(fpOutputFile,"(*pEZ_XOVER_PROB)");     
+      fprintf(fpOutputFile,"(*pEZ_XOVER_PROB)");
     }
  }
 	YY_BREAK
@@ -6661,6 +6684,7 @@ YY_RULE_SETUP
 case 288:
 /* rule 288 can match eol */
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
+YY_LINENO_REWIND_TO(yy_bp + 10);
 (yy_c_buf_p) = yy_cp = yy_bp + 10;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
@@ -6668,7 +6692,7 @@ YY_RULE_SETUP
 {
   if (bDoubleQuotes) fprintf(fpOutputFile,"XOVER_PROB");
   else {
-      fprintf(fpOutputFile,"(*pEZ_XOVER_PROB)");     
+      fprintf(fpOutputFile,"(*pEZ_XOVER_PROB)");
     }
  }
 	YY_BREAK
@@ -6681,6 +6705,7 @@ YY_RULE_SETUP
 case 290:
 /* rule 290 can match eol */
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
+YY_LINENO_REWIND_TO(yy_bp + 9);
 (yy_c_buf_p) = yy_cp = yy_bp + 9;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
@@ -6692,17 +6717,18 @@ case 291:
 YY_RULE_SETUP
 #line 2087 "compiler/EaseaLex.l"
 {if (bDoubleQuotes) fprintf(fpOutputFile,"MINIMISE"); // local genome name
-    } 
+    }
 	YY_BREAK
 case 292:
 /* rule 292 can match eol */
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
+YY_LINENO_REWIND_TO(yy_bp + 8);
 (yy_c_buf_p) = yy_cp = yy_bp + 8;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
 #line 2089 "compiler/EaseaLex.l"
 {if (bDoubleQuotes) fprintf(fpOutputFile,"MINIMISE"); // local genome name
-    } 
+    }
 	YY_BREAK
 case 293:
 YY_RULE_SETUP
@@ -6713,6 +6739,7 @@ YY_RULE_SETUP
 case 294:
 /* rule 294 can match eol */
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
+YY_LINENO_REWIND_TO(yy_bp + 8);
 (yy_c_buf_p) = yy_cp = yy_bp + 8;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
@@ -6729,6 +6756,7 @@ YY_RULE_SETUP
 case 296:
 /* rule 296 can match eol */
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
+YY_LINENO_REWIND_TO(yy_bp + 8);
 (yy_c_buf_p) = yy_cp = yy_bp + 8;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
@@ -6745,6 +6773,7 @@ YY_RULE_SETUP
 case 298:
 /* rule 298 can match eol */
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
+YY_LINENO_REWIND_TO(yy_bp + 8);
 (yy_c_buf_p) = yy_cp = yy_bp + 8;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
@@ -6758,7 +6787,7 @@ YY_RULE_SETUP
 #line 2104 "compiler/EaseaLex.l"
 {fprintf(stderr,"\n%s - Error line %d: The current generation number cannot be changed (not an l-value).\n    hint -> You must have meant \"NB_GEN=...\" rather than \"currentGeneration=...\"\n",sEZ_FILE_NAME,yylineno);
   exit(1);
- } 
+ }
 	YY_BREAK
 case 300:
 /* rule 300 can match eol */
@@ -6920,7 +6949,7 @@ case 321:
 /* rule 321 can match eol */
 YY_RULE_SETUP
 #line 2171 "compiler/EaseaLex.l"
-{putc(yytext[0],fpOutputFile);}                                      
+{putc(yytext[0],fpOutputFile);}
 	YY_BREAK
 /****************************************
   *  Basic copy to .cpp file with minor changes
@@ -7000,7 +7029,7 @@ YY_RULE_SETUP
 #line 2214 "compiler/EaseaLex.l"
 {
 
-  if(bWithinOptimiser || bWithinEvaluator || bWithinMutator || bWithinDisplayFunction){ 
+  if(bWithinOptimiser || bWithinEvaluator || bWithinMutator || bWithinDisplayFunction){
     if( bWithinCUDA_Evaluator)
       fprintf(fpOutputFile, "(*INDIVIDUAL_ACCESS(devBuffer,id))");
     else fprintf(fpOutputFile, "(*this)");
@@ -7029,6 +7058,7 @@ YY_RULE_SETUP
 case 335:
 /* rule 335 can match eol */
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
+YY_LINENO_REWIND_TO(yy_bp + 17);
 (yy_c_buf_p) = yy_cp = yy_bp + 17;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
@@ -7047,6 +7077,7 @@ YY_RULE_SETUP
 case 337:
 /* rule 337 can match eol */
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
+YY_LINENO_REWIND_TO(yy_bp + 6);
 (yy_c_buf_p) = yy_cp = yy_bp + 6;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
@@ -7063,6 +7094,7 @@ YY_RULE_SETUP
 case 339:
 /* rule 339 can match eol */
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
+YY_LINENO_REWIND_TO(yy_bp + 8);
 (yy_c_buf_p) = yy_cp = yy_bp + 8;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
@@ -7083,6 +7115,7 @@ YY_RULE_SETUP
 case 341:
 /* rule 341 can match eol */
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
+YY_LINENO_REWIND_TO(yy_bp + 8);
 (yy_c_buf_p) = yy_cp = yy_bp + 8;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
@@ -7098,7 +7131,7 @@ case 342:
 YY_RULE_SETUP
 #line 2255 "compiler/EaseaLex.l"
 {
-  if (bDoubleQuotes) 
+  if (bDoubleQuotes)
     fprintf(fpOutputFile,"XOVER_PROB");
   else if( TARGET==CUDA || TARGET==STD )
     fprintf(fpOutputFile,"(*pEZ_XOVER_PROB)");
@@ -7107,12 +7140,13 @@ YY_RULE_SETUP
 case 343:
 /* rule 343 can match eol */
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
+YY_LINENO_REWIND_TO(yy_bp + 10);
 (yy_c_buf_p) = yy_cp = yy_bp + 10;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
 #line 2261 "compiler/EaseaLex.l"
 {
-  if (bDoubleQuotes) 
+  if (bDoubleQuotes)
     fprintf(fpOutputFile,"XOVER_PROB");
   else if( TARGET==CUDA || TARGET==STD )
     fprintf(fpOutputFile,"(*pEZ_XOVER_PROB)");
@@ -7127,6 +7161,7 @@ YY_RULE_SETUP
 case 345:
 /* rule 345 can match eol */
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
+YY_LINENO_REWIND_TO(yy_bp + 9);
 (yy_c_buf_p) = yy_cp = yy_bp + 9;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
@@ -7157,7 +7192,7 @@ case 349:
 YY_RULE_SETUP
 #line 2275 "compiler/EaseaLex.l"
 {
-  fprintf(stderr,"\n%s - Error line %d: The mutation probability can only be changed within the generation function.\n",sEZ_FILE_NAME,yylineno); 
+  fprintf(stderr,"\n%s - Error line %d: The mutation probability can only be changed within the generation function.\n",sEZ_FILE_NAME,yylineno);
   exit (1);
 }
 	YY_BREAK
@@ -7237,11 +7272,11 @@ YY_RULE_SETUP
 {if (bWithinEvaluator) {
     if( TARGET==CUDA || TARGET==STD) {
       if( bWithinCUDA_Evaluator ){
-	fprintf(fpOutputFile,"return "); 
+	fprintf(fpOutputFile,"return ");
 	//bWithinCUDA_Evaluator = 0;
       }
       else
-	fprintf(fpOutputFile,"return fitness = "); 
+	fprintf(fpOutputFile,"return fitness = ");
       bCatchNextSemiColon=false;
     }
     //bWithinEvaluator=0;
@@ -7278,7 +7313,7 @@ case 365:
 /* rule 365 can match eol */
 YY_RULE_SETUP
 #line 2330 "compiler/EaseaLex.l"
-{putc(yytext[0],fpOutputFile);}                                      
+{putc(yytext[0],fpOutputFile);}
 	YY_BREAK
 /****************************************
    Looks for run parameters in the .ez file
@@ -7296,7 +7331,7 @@ case 367:
 /* rule 367 can match eol */
 YY_RULE_SETUP
 #line 2340 "compiler/EaseaLex.l"
-{/*putc(yytext[0],fpOutputFile);*/}                                      
+{/*putc(yytext[0],fpOutputFile);*/}
 	YY_BREAK
 /* takes care of C++-like comments */
 case 368:
@@ -7568,7 +7603,7 @@ YY_RULE_SETUP
 {
   if( bVERBOSE ) printf("\tMax init tree depth...\n");
   return MAX_INIT_TREE_D;
- }            
+ }
 	YY_BREAK
 case 410:
 /* rule 410 can match eol */
@@ -7577,7 +7612,7 @@ YY_RULE_SETUP
 {
   if( bVERBOSE ) printf("\tMin init tree depth...\n");
   return MIN_INIT_TREE_D;
- }            
+ }
 	YY_BREAK
 case 411:
 /* rule 411 can match eol */
@@ -7586,7 +7621,7 @@ YY_RULE_SETUP
 {
   if( bVERBOSE ) printf("\tMax tree depth...\n");
   return MAX_TREE_D;
- }            
+ }
 	YY_BREAK
 case 412:
 /* rule 412 can match eol */
@@ -7595,7 +7630,7 @@ YY_RULE_SETUP
 {
   if( bVERBOSE ) printf("\tNo of GPUs...\n");
   return NB_GPU;
- }            
+ }
 	YY_BREAK
 case 413:
 /* rule 413 can match eol */
@@ -7604,7 +7639,7 @@ YY_RULE_SETUP
 {
   if( bVERBOSE ) printf("\tProgramm length buffer...\n");
   return PRG_BUF_SIZE;
- }            
+ }
 	YY_BREAK
 case 414:
 /* rule 414 can match eol */
@@ -7613,7 +7648,7 @@ YY_RULE_SETUP
 {
   if( bVERBOSE ) printf("\tNo of fitness cases...\n");
   return NO_FITNESS_CASES;
- }            
+ }
 	YY_BREAK
 /****************************************
  * all other characters
@@ -7628,7 +7663,7 @@ YY_RULE_SETUP
 #line 2460 "compiler/EaseaLex.l"
 ECHO;
 	YY_BREAK
-#line 7632 "compiler/EaseaLex.cpp"
+#line 7667 "compiler/EaseaLex.cpp"
 			case YY_STATE_EOF(INITIAL):
 			case YY_STATE_EOF(GENOME_ANALYSIS):
 			case YY_STATE_EOF(TEMPLATE_ANALYSIS):
@@ -7777,6 +7812,7 @@ ECHO;
 			"fatal flex scanner internal error--no action found" );
 	} /* end of action switch */
 		} /* end of scanning one token */
+	} /* end of user's declarations */
 } /* end of yylex */
 
 /* yy_get_next_buffer - try to read in a new buffer
@@ -7788,9 +7824,9 @@ ECHO;
  */
 static int yy_get_next_buffer (void)
 {
-    	register char *dest = YY_CURRENT_BUFFER_LVALUE->yy_ch_buf;
-	register char *source = (yytext_ptr);
-	register int number_to_move, i;
+    	char *dest = YY_CURRENT_BUFFER_LVALUE->yy_ch_buf;
+	char *source = (yytext_ptr);
+	yy_size_t number_to_move, i;
 	int ret_val;
 
 	if ( (yy_c_buf_p) > &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[(yy_n_chars) + 1] )
@@ -7819,7 +7855,7 @@ static int yy_get_next_buffer (void)
 	/* Try to read more data. */
 
 	/* First move last chars to start of buffer. */
-	number_to_move = (int) ((yy_c_buf_p) - (yytext_ptr)) - 1;
+	number_to_move = (yy_size_t) ((yy_c_buf_p) - (yytext_ptr)) - 1;
 
 	for ( i = 0; i < number_to_move; ++i )
 		*(dest++) = *(source++);
@@ -7832,7 +7868,7 @@ static int yy_get_next_buffer (void)
 
 	else
 		{
-			int num_to_read =
+			yy_size_t num_to_read =
 			YY_CURRENT_BUFFER_LVALUE->yy_buf_size - number_to_move - 1;
 
 		while ( num_to_read <= 0 )
@@ -7848,7 +7884,7 @@ static int yy_get_next_buffer (void)
 
 		/* Read in more data. */
 		YY_INPUT( (&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move]),
-			(yy_n_chars), (size_t) num_to_read );
+			(yy_n_chars), num_to_read );
 
 		YY_CURRENT_BUFFER_LVALUE->yy_n_chars = (yy_n_chars);
 		}
@@ -7893,8 +7929,8 @@ static int yy_get_next_buffer (void)
 
     static yy_state_type yy_get_previous_state (void)
 {
-	register yy_state_type yy_current_state;
-	register char *yy_cp;
+	yy_state_type yy_current_state;
+	char *yy_cp;
     
 	yy_current_state = (yy_start);
 	yy_current_state += YY_AT_BOL();
@@ -7904,7 +7940,7 @@ static int yy_get_next_buffer (void)
 
 	for ( yy_cp = (yytext_ptr) + YY_MORE_ADJ; yy_cp < (yy_c_buf_p); ++yy_cp )
 		{
-		register YY_CHAR yy_c = (*yy_cp ? yy_ec[YY_SC_TO_UI(*yy_cp)] : 1);
+		YY_CHAR yy_c = (*yy_cp ? yy_ec[YY_SC_TO_UI(*yy_cp)] : 1);
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
@@ -7925,9 +7961,9 @@ static int yy_get_next_buffer (void)
  */
     static yy_state_type yy_try_NUL_trans  (yy_state_type yy_current_state )
 {
-	register int yy_is_jam;
+	int yy_is_jam;
     
-	register YY_CHAR yy_c = 1;
+	YY_CHAR yy_c = 1;
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
@@ -7939,12 +7975,14 @@ static int yy_get_next_buffer (void)
 	if ( ! yy_is_jam )
 		*(yy_state_ptr)++ = yy_current_state;
 
-	return yy_is_jam ? 0 : yy_current_state;
+		return yy_is_jam ? 0 : yy_current_state;
 }
 
-    static void yyunput (int c, register char * yy_bp )
+#ifndef YY_NO_UNPUT
+
+    static void yyunput (int c, char * yy_bp )
 {
-	register char *yy_cp;
+	char *yy_cp;
     
     yy_cp = (yy_c_buf_p);
 
@@ -7954,10 +7992,10 @@ static int yy_get_next_buffer (void)
 	if ( yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf + 2 )
 		{ /* need to shift things up to make room */
 		/* +2 for EOB chars. */
-		register int number_to_move = (yy_n_chars) + 2;
-		register char *dest = &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[
+		yy_size_t number_to_move = (yy_n_chars) + 2;
+		char *dest = &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[
 					YY_CURRENT_BUFFER_LVALUE->yy_buf_size + 2];
-		register char *source =
+		char *source =
 				&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move];
 
 		while ( source > YY_CURRENT_BUFFER_LVALUE->yy_ch_buf )
@@ -7983,6 +8021,8 @@ static int yy_get_next_buffer (void)
 	(yy_c_buf_p) = yy_cp;
 }
 
+#endif
+
 #ifndef YY_NO_INPUT
 #ifdef __cplusplus
     static int yyinput (void)
@@ -8007,7 +8047,7 @@ static int yy_get_next_buffer (void)
 
 		else
 			{ /* need more input */
-			int offset = (yy_c_buf_p) - (yytext_ptr);
+			yy_size_t offset = (yy_c_buf_p) - (yytext_ptr);
 			++(yy_c_buf_p);
 
 			switch ( yy_get_next_buffer(  ) )
@@ -8138,7 +8178,7 @@ static void yy_load_buffer_state  (void)
 	if ( ! b )
 		YY_FATAL_ERROR( "out of dynamic memory in yy_create_buffer()" );
 
-	b->yy_buf_size = size;
+	b->yy_buf_size = (yy_size_t)size;
 
 	/* yy_ch_buf has to be 2 characters longer than the size given because
 	 * we need to put in 2 end-of-buffer characters.
@@ -8173,10 +8213,6 @@ static void yy_load_buffer_state  (void)
 	yyfree((void *) b  );
 }
 
-#ifndef __cplusplus
-extern int isatty (int );
-#endif /* __cplusplus */
-    
 /* Initializes or reinitializes a buffer.
  * This function is sometimes called more than once on the same buffer,
  * such as during a yyrestart() or at EOF.
@@ -8289,7 +8325,7 @@ void yypop_buffer_state (void)
  */
 static void yyensure_buffer_stack (void)
 {
-	int num_to_alloc;
+	yy_size_t num_to_alloc;
     
 	if (!(yy_buffer_stack)) {
 
@@ -8297,7 +8333,7 @@ static void yyensure_buffer_stack (void)
 		 * scanner will even need a stack. We use 2 instead of 1 to avoid an
 		 * immediate realloc on the next call.
          */
-		num_to_alloc = 1;
+      num_to_alloc = 1; /* After all that talk, this was set to 1 anyways... */
 		(yy_buffer_stack) = (struct yy_buffer_state**)yyalloc
 								(num_to_alloc * sizeof(struct yy_buffer_state*)
 								);
@@ -8314,7 +8350,7 @@ static void yyensure_buffer_stack (void)
 	if ((yy_buffer_stack_top) >= ((yy_buffer_stack_max)) - 1){
 
 		/* Increase the buffer to prepare for a possible push. */
-		int grow_size = 8 /* arbitrary grow size */;
+		yy_size_t grow_size = 8 /* arbitrary grow size */;
 
 		num_to_alloc = (yy_buffer_stack_max) + grow_size;
 		(yy_buffer_stack) = (struct yy_buffer_state**)yyrealloc
@@ -8386,12 +8422,12 @@ YY_BUFFER_STATE yy_scan_string (yyconst char * yystr )
  * 
  * @return the newly allocated buffer state object.
  */
-YY_BUFFER_STATE yy_scan_bytes  (yyconst char * yybytes, int  _yybytes_len )
+YY_BUFFER_STATE yy_scan_bytes  (yyconst char * yybytes, yy_size_t  _yybytes_len )
 {
 	YY_BUFFER_STATE b;
 	char *buf;
 	yy_size_t n;
-	int i;
+	yy_size_t i;
     
 	/* Get memory for full buffer, including space for trailing EOB's. */
 	n = _yybytes_len + 2;
@@ -8422,7 +8458,7 @@ YY_BUFFER_STATE yy_scan_bytes  (yyconst char * yybytes, int  _yybytes_len )
 
 static void yy_fatal_error (yyconst char* msg )
 {
-    	(void) fprintf( stderr, "%s\n", msg );
+			(void) fprintf( stderr, "%s\n", msg );
 	exit( YY_EXIT_FAILURE );
 }
 
@@ -8473,7 +8509,7 @@ FILE *yyget_out  (void)
 /** Get the length of the current token.
  * 
  */
-int yyget_leng  (void)
+yy_size_t yyget_leng  (void)
 {
         return yyleng;
 }
@@ -8488,29 +8524,29 @@ char *yyget_text  (void)
 }
 
 /** Set the current line number.
- * @param line_number
+ * @param _line_number line number
  * 
  */
-void yyset_lineno (int  line_number )
+void yyset_lineno (int  _line_number )
 {
     
-    yylineno = line_number;
+    yylineno = _line_number;
 }
 
 /** Set the input stream. This does not discard the current
  * input buffer.
- * @param in_str A readable stream.
+ * @param _in_str A readable stream.
  * 
  * @see yy_switch_to_buffer
  */
-void yyset_in (FILE *  in_str )
+void yyset_in (FILE *  _in_str )
 {
-        yyin = in_str ;
+        yyin = _in_str ;
 }
 
-void yyset_out (FILE *  out_str )
+void yyset_out (FILE *  _out_str )
 {
-        yyout = out_str ;
+        yyout = _out_str ;
 }
 
 int yyget_debug  (void)
@@ -8518,9 +8554,9 @@ int yyget_debug  (void)
         return yy_flex_debug;
 }
 
-void yyset_debug (int  bdebug )
+void yyset_debug (int  _bdebug )
 {
-        yy_flex_debug = bdebug ;
+        yy_flex_debug = _bdebug ;
 }
 
 static int yy_init_globals (void)
@@ -8591,7 +8627,8 @@ int yylex_destroy  (void)
 #ifndef yytext_ptr
 static void yy_flex_strncpy (char* s1, yyconst char * s2, int n )
 {
-	register int i;
+		
+	int i;
 	for ( i = 0; i < n; ++i )
 		s1[i] = s2[i];
 }
@@ -8600,7 +8637,7 @@ static void yy_flex_strncpy (char* s1, yyconst char * s2, int n )
 #ifdef YY_NEED_STRLEN
 static int yy_flex_strlen (yyconst char * s )
 {
-	register int n;
+	int n;
 	for ( n = 0; s[n]; ++n )
 		;
 
@@ -8610,11 +8647,12 @@ static int yy_flex_strlen (yyconst char * s )
 
 void *yyalloc (yy_size_t  size )
 {
-	return (void *) malloc( size );
+			return (void *) malloc( size );
 }
 
 void *yyrealloc  (void * ptr, yy_size_t  size )
 {
+		
 	/* The cast to (char *) in the following accommodates both
 	 * implementations that use char* generic pointers, and those
 	 * that use void* generic pointers.  It works with the latter
@@ -8627,7 +8665,7 @@ void *yyrealloc  (void * ptr, yy_size_t  size )
 
 void yyfree (void * ptr )
 {
-	free( (char *) ptr );	/* see yyrealloc() for (char *) cast */
+			free( (char *) ptr );	/* see yyrealloc() for (char *) cast */
 }
 
 #define YYTABLES_NAME "yytables"
@@ -8650,15 +8688,15 @@ inline int mystricmp(const char *string1, const char *string2){
   if (string2[i]) return  -(i+1);
   if (string1[i]) return  i+1;
   return 0;
-}                                  
+}
 
-inline int isLetter(char c){ 
+inline int isLetter(char c){
   if (((c>=65)&&(c<=90))||((c>=97)&&(c<=122))) return 1;
   if ((c==45)||(c==46)||(c==95)) return 1;
   return 0;
 }
 
-inline int isFigure(char c){ 
+inline int isFigure(char c){
   if ((c>=48)&&(c<=57)) return 1;
   return 0;
 }
@@ -8667,7 +8705,7 @@ inline int isFigure(char c){
 // EASEALexer commands
 
 int CEASEALexer_create(CSymbolTable* pSymTable)
-{ 
+{
   int i;
   char sTemp[1000];
 #if defined UNIX_OS
@@ -8679,9 +8717,9 @@ int CEASEALexer_create(CSymbolTable* pSymTable)
 #endif
   //assert(pParser != NULL);
   //assert(pSymTable != NULL);
-  
+
   pSymbolTable = pSymTable;
-  //if (!yycreate(pParser)) return 0;    
+  //if (!yycreate(pParser)) return 0;
 
   if (bVERBOSE) {
 	printf("\n                                                                   ");
@@ -8696,13 +8734,13 @@ int CEASEALexer_create(CSymbolTable* pSymTable)
   	printf("\n                              ___________________     ");
  	printf("\n                                                                    ");
   }
-  
+
   if (sRAW_PROJECT_NAME[0]==0){
     printf("\nInsert a .ez file name or a local project name: ");
     scanf("%s",sRAW_PROJECT_NAME);
-  }                         
+  }
   if (bVERBOSE) printf("\n");
-  
+
   if (TARGET==0) {
  /*     printf("\nPlease select a target library (GALib STD or CUDA): "); */
  /*     scanf("%s",sTemp); */
@@ -8712,20 +8750,20 @@ int CEASEALexer_create(CSymbolTable* pSymTable)
     TARGET = STD;
   }
 
-  /////////////////////////////////////////////////////////  
+  /////////////////////////////////////////////////////////
   //strcpy(sTemp,"e:\\lutton\\easea\\debug");pour tester sous windows
   if ((sEZ_PATH==NULL)||(sEZ_PATH[0]==0)) {
     if (getenv("EZ_PATH")==NULL){
-      //strcpy(sEZ_PATH,"./tpl/");	
-      strcpy(sEZ_PATH,"./");	
+      //strcpy(sEZ_PATH,"./tpl/");
+      strcpy(sEZ_PATH,"./");
     }else
       strcpy(sEZ_PATH,getenv("EZ_PATH"));
   }
 
   strcpy(sTPL_DIR,sEZ_PATH);
   strcat(sTPL_DIR,"tpl/");
-  
- 
+
+
   switch (OPERATING_SYSTEM) {
   case UNIX : if (sEZ_PATH[strlen(sEZ_PATH)-1] != '/') strcat (sEZ_PATH,"./"); break;
   case WINDOWS : if (sEZ_PATH[strlen(sEZ_PATH)-1] != '\\') strcat (sEZ_PATH,"\\"); break;
@@ -8743,7 +8781,7 @@ int CEASEALexer_create(CSymbolTable* pSymTable)
       strcat(sTemp,"CUDA_GP.tpl");
     else if(TARGET_FLAVOR == MEMETIC )
       strcat(sTemp,"CUDA_MEM.tpl");
-    else 
+    else
       strcat(sTemp,"CUDA_MO.tpl");
     printf("tpl file : %s\n",sTemp);
     if (!(yyin = fpTemplateFile = fopen(sTemp, "r"))){
@@ -8771,12 +8809,12 @@ int CEASEALexer_create(CSymbolTable* pSymTable)
       exit(1);
     }
   }
-  
+
   if ((sRAW_PROJECT_NAME[0]=='"')&&(OPERATING_SYSTEM!=WINDOWS)){
     strcpy(sRAW_PROJECT_NAME,&(sRAW_PROJECT_NAME[1]));
     sRAW_PROJECT_NAME[strlen(sRAW_PROJECT_NAME)-1]=0;
   }
-  if (strlen(sRAW_PROJECT_NAME)>3) 
+  if (strlen(sRAW_PROJECT_NAME)>3)
     if (!mystricmp(".EZ",&(sRAW_PROJECT_NAME[strlen(sRAW_PROJECT_NAME)-3])))
       sRAW_PROJECT_NAME[strlen(sRAW_PROJECT_NAME)-3]=0;
 
@@ -8785,15 +8823,15 @@ int CEASEALexer_create(CSymbolTable* pSymTable)
 
   for (i=strlen(sRAW_PROJECT_NAME)-1;isFigure(sRAW_PROJECT_NAME[i]) || isLetter(sRAW_PROJECT_NAME[i]);i--);
   strcpy (sPROJECT_NAME,&(sRAW_PROJECT_NAME[i+1]));
-  
+
   for(i=0;i<(int)strlen(sPROJECT_NAME);i++) sLOWER_CASE_PROJECT_NAME[i]=mytolower(sPROJECT_NAME[i]);
-  
+
   if ((!isLetter(sPROJECT_NAME[0]))&&(sPROJECT_NAME[0]!='"')&&(sPROJECT_NAME[0]!='/')&&(sPROJECT_NAME[0]!='\\')) {
     fprintf(stderr,"\n*** Project names starting with non-letters are invalid.\n*** Please choose another name.\n"); return 0;}
-                                                                           
+
   if (!(fpGenomeFile = fopen(sEZ_FILE_NAME, "r"))){
     fprintf(stderr,"\n*** Could not open %s\n",sEZ_FILE_NAME); return 0;}
- 
+
   return 1;
 }
 
@@ -8810,5 +8848,5 @@ double myStrtod(){
     printf("number too large\n");
   }
   return d;
-}                               
+}
 

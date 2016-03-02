@@ -909,7 +909,7 @@ exponent  ([Ee][+-]?[0-9]+)
       if (pSym->Object->ObjectType==oObject)
 	fprintf(fpOutputFile,"    %s=genome.%s;\n",pSym->Object->sName,pSym->Object->sName);
       if (pSym->Object->ObjectType==oPointer)
-	fprintf(fpOutputFile,"    %s=(genome.%s ? genome.%s->clone() : NULL);\n",pSym->Object->sName,pSym->Object->sName,pSym->Object->pType->sName,pSym->Object->sName);
+	fprintf(fpOutputFile,"    %s=(genome.%s ? genome.%s->clone() : NULL);\n",pSym->Object->sName,pSym->Object->sName,pSym->Object->sName);
       if (pSym->Object->ObjectType==oArray){
 	fprintf(fpOutputFile,"    {for(int EASEA_Ndx=0; EASEA_Ndx<%d; EASEA_Ndx++)\n",pSym->Object->nSize/pSym->Object->pType->nSize);
 	fprintf(fpOutputFile,"       %s[EASEA_Ndx]=genome.%s[EASEA_Ndx];}\n",pSym->Object->sName,pSym->Object->sName);

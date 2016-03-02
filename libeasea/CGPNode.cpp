@@ -97,10 +97,10 @@ int collectNodesDepth(const int goalDepth, GPNode** collection, int collected, i
 en
 */
 GPNode* selectNode( GPNode* root, int* childId, int* depth){
-  
+
   int xoverDepth = globalRandomGenerator->random(0,depthOfTree(root));
   (*depth) = xoverDepth;
-  
+
   GPNode** dNodes;
   int collected;
 
@@ -125,7 +125,7 @@ GPNode* selectNode( GPNode* root, int* childId, int* depth){
       break;
     }
     else i+=opArity[(int)dNodes[parentIndexP++]->opCode];
-  
+
   *childId = reminderP;
   //cout << "d of x : " << xoverDepth << "/" << depthOfTree(root)<< " n : "<< xoverP << endl;
   GPNode* ret = dNodes[parentIndexP];
@@ -133,7 +133,33 @@ GPNode* selectNode( GPNode* root, int* childId, int* depth){
   return ret;
 }
 
+GPNode* init_node(int i) {
+    GPNode* node = NULL;
 
+    switch(i) {
+        case 0:
+        case 1:
+            node = new GPNodeVar();
+            ((GPNodeVar*)node)->index = i;
+            break;
+        case 2:
+            node = new GPNodeVal();
+            break;
+        case 3:
+            node = new GPNodeNOT();
+            break;
+        case 4:
+            node = new GPNodeOR();
+            break;
+        case 5:
+            node = new GPNodeAND();
+            std::cout << "And maggle\n";
+            break;
+    }
+
+    node->opCode = i;
+    return node;
+}
 
 /**
    Recursive construction method for trees.
@@ -147,30 +173,30 @@ GPNode* selectNode( GPNode* root, int* childId, int* depth){
    @arg maxDepth : The maximum depth of the resulting tree.
    @arg full : whether the construction method used has to be full (from koza's book)
    Otherwise, it will use grow method (defined in the same book).
- 
+
    @return : pointer to the root node of the resulting sub tree
 */
 GPNode* construction_method( const int constLen, const int totalLen , const int currentDepth,
            const int maxDepth, const bool full,
            const unsigned* opArity, const int OP_ERC){
-  GPNode* node = new GPNode();
+  GPNode* node = NULL;
   // first select the opCode for the current Node.
   if( full ){
-    if( currentDepth<maxDepth ) node->opCode = globalRandomGenerator->random(constLen,totalLen);
-    else node->opCode = globalRandomGenerator->random(0, constLen);
+    if( currentDepth<maxDepth ) node = init_node(globalRandomGenerator->random(constLen,totalLen));
+    else node = init_node(globalRandomGenerator->random(0, constLen));
   }
   else{
-    if( currentDepth<maxDepth ) node->opCode = globalRandomGenerator->random(0, totalLen);
-    else node->opCode = globalRandomGenerator->random(0, constLen);
+    if( currentDepth<maxDepth ) node = init_node(globalRandomGenerator->random(0, totalLen));
+    else node = init_node(globalRandomGenerator->random(0, constLen));
   }
- 
+
   int arity = opArity[(int)node->opCode];
   //node->arity = arity;
 
   // construct children (if any)
   for( int i=0 ; i<arity ; i++ )
     node->children[i] = construction_method(constLen, totalLen, currentDepth+1, maxDepth, full, opArity, OP_ERC);
-  
+
   // affect null to other array cells (if any)
   for( int i=arity ; i<MAX_ARITY ; i++ )
     node->children[i] = NULL;
@@ -184,14 +210,15 @@ GPNode* construction_method( const int constLen, const int totalLen , const int 
   return node;
 }
 
-GPNode* RAMPED_H_H(unsigned INIT_TREE_DEPTH_MIN, unsigned INIT_TREE_DEPTH_MAX, unsigned actualParentPopulationSize, unsigned parentPopulationSize, 
+
+GPNode* RAMPED_H_H(unsigned INIT_TREE_DEPTH_MIN, unsigned INIT_TREE_DEPTH_MAX, unsigned actualParentPopulationSize, unsigned parentPopulationSize,
        float GROW_FULL_RATIO, unsigned VAR_LEN, unsigned OPCODE_SIZE, const unsigned* opArity, const int OP_ERC){
   /**
      This is the standard ramped half-and-half method
      for creation of trees.
    */
-  int id = actualParentPopulationSize;  
-  int seg = parentPopulationSize/(INIT_TREE_DEPTH_MAX-INIT_TREE_DEPTH_MIN); 
+  int id = actualParentPopulationSize;
+  int seg = parentPopulationSize/(INIT_TREE_DEPTH_MAX-INIT_TREE_DEPTH_MIN);
   int currentDepth = INIT_TREE_DEPTH_MIN+id/seg;
 
   bool full;
@@ -255,7 +282,7 @@ void toDotFile_r(GPNode* root, FILE* outputFile, const unsigned* opArity , const
       root->erc_value);
  else
    fprintf(outputFile," %ld [label=\"%s\"];\n", (long int)root, opCodeName[(int)root->opCode]);
-  
+
   for( unsigned i=0 ; i<opArity[(int)root->opCode] ; i++ ){
     if( root->children[i] ){
       fprintf(outputFile,"%ld -> %ld;\n", (long int)root, (long int)root->children[i]);

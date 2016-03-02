@@ -8,6 +8,7 @@
 #define __C_GPNODE__
 
 #include <iostream>
+#include <cstdlib>
 
 using namespace std;
 
@@ -29,6 +30,9 @@ class GPNode {
     // char opCode;
     int opCode;
     GPNode* children[2];
+
+    virtual float getValue(float input[]){ return 0; }
+    virtual void mutate(){ }
 
     GPNode(){  // Constructor
       for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
@@ -107,6 +111,25 @@ class GPNode {
     }
 };
 
+class GPNodeTerminal : public GPNode {
+    bool isTerminal() { return true; }
+};
+
+class GPNodeVal : public GPNodeTerminal {
+  public:
+  float value;
+    void mutate(){ value = static_cast <float> (rand()) / static_cast <float> (RAND_MAX); };
+
+    float getValue(float input[]){ return value; };
+};
+
+class GPNodeVar : public GPNodeTerminal {
+  public:
+    int index;
+    void mutate(){};
+
+    float getValue(float input[]){ return input[index]; };
+};
 
 class GPNodeNonTerminal : public GPNode {
     bool isTerminal() { return false; }
@@ -116,28 +139,28 @@ class GPNodeOR : public GPNodeNonTerminal {
   public:
    void mutate(){};
 
-    float getValue(){
-        return children[0].getValue() || children[1].getValue();
+    float getValue(float input[]){
+        return children[0]->getValue(input) || children[1]->getValue(input);
     };
-}
+};
 
 class GPNodeAND : public GPNodeNonTerminal {
   public:
    void mutate(){};
 
-    float getValue(){
-        return children[0].getValue() && children[1].getValue();
+    float getValue(float input[]){
+        return children[0]->getValue(input) && children[1]->getValue(input);
     };
-}
+};
 
 class GPNodeNOT : public GPNodeNonTerminal {
   public:
    void mutate(){};
 
-    float getValue(){
-        return !(children[0].getValue() || children[1].getValue());
+    float getValue(float input[]){
+        return !(children[0]->getValue(input));
     };
-}
+};
 
 /* Here are some utility functions for the template GP */
 int depthOfTree(GPNode* root);

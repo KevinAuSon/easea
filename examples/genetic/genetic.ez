@@ -146,20 +146,13 @@ OP_X, "x", 0, {RESULT=INPUT[0];};
 OP_Y, "y", 0, {RESULT=INPUT[1];};
 OP_ERC, "ERC", 0, {RESULT=ERC;};
 OP_NOT, "NOT", 1, {
-    RESULT = false;
-    for(int i = 0; i < size; i++)
-        RESULT = RESULT || children_values[i];
-    RESULT = !RESULT;
+    RESULT = root->getValue(input);
 };
 OP_OR, "OR", 2, {
-    RESULT = false;
-    for(int i = 0; i < size; i++)
-        RESULT = RESULT || children_values[i];
+    RESULT = root->getValue(input);
 };
 OP_AND, "AND", 2, {
-    RESULT = true;
-    for(int i = 0; i < size; i++)
-        RESULT = RESULT && children_values[i];
+    RESULT = root->getValue(input);
 };
 
 \end
@@ -168,7 +161,7 @@ OP_AND, "AND", 2, {
 {
   double value = 0.;
   for(int i = 0; i < NO_FITNESS_CASES; i++) {
-    float evolvedValue = recEval(this->root,inputs[i]);
+    float evolvedValue = this->root->getValue(inputs[i]);
     value += square(outputs[i] - evolvedValue);
   }
 

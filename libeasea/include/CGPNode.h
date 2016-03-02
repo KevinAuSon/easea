@@ -107,6 +107,38 @@ class GPNode {
     }
 };
 
+
+class GPNodeNonTerminal : public GPNode {
+    bool isTerminal() { return false; }
+};
+
+class GPNodeOR : public GPNodeNonTerminal {
+  public:
+   void mutate(){};
+
+    float getValue(){
+        return children[0].getValue() || children[1].getValue();
+    };
+}
+
+class GPNodeAND : public GPNodeNonTerminal {
+  public:
+   void mutate(){};
+
+    float getValue(){
+        return children[0].getValue() && children[1].getValue();
+    };
+}
+
+class GPNodeNOT : public GPNodeNonTerminal {
+  public:
+   void mutate(){};
+
+    float getValue(){
+        return !(children[0].getValue() || children[1].getValue());
+    };
+}
+
 /* Here are some utility functions for the template GP */
 int depthOfTree(GPNode* root);
 int enumTreeNodes(GPNode* root);

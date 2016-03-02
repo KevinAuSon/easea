@@ -153,7 +153,6 @@ GPNode* init_node(int i) {
             break;
         case 5:
             node = new GPNodeAND();
-            std::cout << "And maggle\n";
             break;
     }
 

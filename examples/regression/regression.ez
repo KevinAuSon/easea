@@ -25,13 +25,15 @@ __________________________________________________________*/
 // note that on 1024 is the maximum size on fermi architectures 512 on older cards.
 #define NUMTHREAD 1024
 #define MAX_STACK 15
-
+float** inputs;
+float* outputs;
 
 #define PI (3.141592653589793)
 \end
 
 \User functions:
 #define POLY(x) x*x*x-3*x*x+x
+inline static double square(double x) { return pow(x, 2); }
 /**
    This function generates data NO_FITNESS_CASES fitness cases,
    from the polynome POLY(X) with X randomly picked between (-1,1)
@@ -55,6 +57,18 @@ int generateData(float*** inputs, float** outputs){
   }
 
   return NO_FITNESS_CASES;
+}
+
+
+int treeSize(GPNode* root) {
+    int result = 1;
+    if(root->children[0])
+        result += treeSize(root->children[0]);
+
+    if(root->children[1])
+        result += treeSize(root->children[1]);
+
+    return result;
 }
 
 
@@ -135,27 +149,27 @@ GenomeClass {
 \begin operator description :
 OP_X, "x", 0, {RESULT=INPUT[0];};
 OP_ERC, "ERC", 0, {RESULT=ERC;};
-OP_ADD, "+", 2, {RESULT=OP1+OP2;};
-OP_SUB, "-", 2, {RESULT=OP1-OP2;};
-OP_MUL, "*", 2, {RESULT=OP1*OP2;};
+OP_ADD, "+", 2, {RESULT=children_values[0]+children_values[1];};
+OP_SUB, "-", 2, {RESULT=children_values[0]-children_values[1];};
+OP_MUL, "*", 2, {RESULT=children_values[0]*children_values[1];};
 OP_DIV, "/", 2, {
-  if( !OP2 ) RESULT = 1;
-  else RESULT = OP1/OP2;
+  if( !children_values[1] ) RESULT = 1;
+  else RESULT = children_values[0]/children_values[1];
 };
 
 \end
 
-
-\GenomeClass::evaluator header:
-\end
-
-\GenomeClass::evaluator for each fc :
-float expected_value = OUTPUT;
-ERROR = (expected_value-EVOLVED_VALUE)*(expected_value-EVOLVED_VALUE);
-\end
-
-\GenomeClass::evaluator accumulator :
-return sqrtf(ERROR);
+\GenomeClass::evaluator : // Returns the score
+{
+  double value = 0.;
+  for(int i = 0; i < NO_FITNESS_CASES; i++) {
+    float evolvedValue = recEval(this->root,inputs[i]);
+    value += square(outputs[i] - evolvedValue);
+  }
+  value *= 10;
+  value += (treeSize(this->root) / 10.);
+  return value; //MSE
+}
 \end
 
 

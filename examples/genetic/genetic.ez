@@ -20,6 +20,8 @@ __________________________________________________________*/
 #define NO_FITNESS_CASES 4
 #define VAR_LEN 2
 #define GROW_FULL_RATIO 0.5
+#include <typeinfo>
+
 
 // this is the number of learning cases computed in parallel.
 // note that on 1024 is the maximum size on fermi architectures 512 on older cards.
@@ -137,7 +139,7 @@ GenomeClass {
 
 \GenomeClass::crossover :
 {
-  simpleCrossOver(parent1,parent2,child);
+  //simpleCrossOver(parent1,parent2,child);
   child.valid = false;
 }
 \end
@@ -153,24 +155,21 @@ GenomeClass {
 
 \begin operator description :
 
-OP_X, "x", 0, {RESULT=INPUT[0];};
-OP_Y, "y", 0, {RESULT=INPUT[1];};
+OP_X, "x", 0, {
+    RESULT=root->getValue(input);
+};
+OP_Y, "y", 0, {RESULT=root->getValue(input);};
 OP_ERC, "ERC", 0, {RESULT=ERC;};
 OP_NOT, "NOT", 1, {
-    RESULT = false;
-    for(int i = 0; i < size; i++)
-        RESULT = RESULT || children_values[i];
-    RESULT = !RESULT;
+    RESULT = !children_values[0];
 };
 OP_OR, "OR", 2, {
     RESULT = false;
     for(int i = 0; i < size; i++)
-        RESULT = RESULT || children_values[i];
+        RESULT = children_values[0] || children_values[1];
 };
 OP_AND, "AND", 2, {
-    RESULT = true;
-    for(int i = 0; i < size; i++)
-        RESULT = RESULT && children_values[i];
+    RESULT = children_values[0] && children_values[1];
 };
 
 \end

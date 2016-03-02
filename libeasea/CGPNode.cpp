@@ -203,6 +203,7 @@ GPNode* construction_method( const int constLen, const int totalLen , const int 
   if( node->opCode==OP_ERC ){
     node->erc_value = globalRandomGenerator->random(0.,1.);
   }
+
   //else if( node->opCode==OP_VAR )
   //node->var_id = globalRandomGenerator->random(1,VAR_LEN);
 

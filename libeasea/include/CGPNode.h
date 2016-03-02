@@ -32,22 +32,14 @@ class GPNode {
     GPNode* children[2];
 
     virtual float getValue(float input[]){ return 0; }
-    virtual void mutate(){ }
 
     GPNode(){  // Constructor
       for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
         children[EASEA_Ndx]=NULL;
     }
 
-
-    GPNode(int var_id, double erc_value, char opCode, GPNode** childrenToAdd) : var_id(var_id), erc_value(erc_value), opCode(opCode)// other constructor
-  {
-    for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
-      this->children[EASEA_Ndx]=childrenToAdd[EASEA_Ndx];
-  }
-
-
     GPNode(const GPNode &EASEA_Var) {  // Copy constructor
+        throw 10;
       var_id=EASEA_Var.var_id;
       erc_value=EASEA_Var.erc_value;
       //arity=EASEA_Var.arity;
@@ -65,18 +57,18 @@ class GPNode {
     }
 
 
-    GPNode& operator=(const GPNode &EASEA_Var) {  // Operator=
-      if (&EASEA_Var == this) return *this;
-      var_id = EASEA_Var.var_id;
-      erc_value = EASEA_Var.erc_value;
-      //arity = EASEA_Var.arity;
-      opCode = EASEA_Var.opCode;
-
-      for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
-        if(EASEA_Var.children[EASEA_Ndx]) children[EASEA_Ndx] = new GPNode(*(EASEA_Var.children[EASEA_Ndx]));
-
-      return *this;
-    }
+//    GPNode& operator=(const GPNode &EASEA_Var) {  // Operator=
+//      if (&EASEA_Var == this) return *this;
+//      var_id = EASEA_Var.var_id;
+//      erc_value = EASEA_Var.erc_value;
+//      //arity = EASEA_Var.arity;
+//      opCode = EASEA_Var.opCode;
+//
+//      for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
+//        if(EASEA_Var.children[EASEA_Ndx]) children[EASEA_Ndx] = new GPNode(*(EASEA_Var.children[EASEA_Ndx]));
+//
+//      return *this;
+//    }
 
 
     bool operator==(GPNode &EASEA_Var) const {  // Operator==
@@ -118,7 +110,6 @@ class GPNodeTerminal : public GPNode {
 class GPNodeVal : public GPNodeTerminal {
   public:
   float value;
-    void mutate(){ value = static_cast <float> (rand()) / static_cast <float> (RAND_MAX); };
 
     float getValue(float input[]){ return value; };
 };
@@ -126,7 +117,6 @@ class GPNodeVal : public GPNodeTerminal {
 class GPNodeVar : public GPNodeTerminal {
   public:
     int index;
-    void mutate(){};
 
     float getValue(float input[]){ return input[index]; };
 };
@@ -137,7 +127,6 @@ class GPNodeNonTerminal : public GPNode {
 
 class GPNodeOR : public GPNodeNonTerminal {
   public:
-   void mutate(){};
 
     float getValue(float input[]){
         return children[0]->getValue(input) || children[1]->getValue(input);
@@ -146,7 +135,6 @@ class GPNodeOR : public GPNodeNonTerminal {
 
 class GPNodeAND : public GPNodeNonTerminal {
   public:
-   void mutate(){};
 
     float getValue(float input[]){
         return children[0]->getValue(input) && children[1]->getValue(input);
@@ -155,7 +143,6 @@ class GPNodeAND : public GPNodeNonTerminal {
 
 class GPNodeNOT : public GPNodeNonTerminal {
   public:
-   void mutate(){};
 
     float getValue(float input[]){
         return !(children[0]->getValue(input));

@@ -1,0 +1,165 @@
+[1mdiff --git a/examples/genetic/genetic.ez b/examples/genetic/genetic.ez[m
+[1mindex 95f1f8f..f1d254c 100755[m
+[1m--- a/examples/genetic/genetic.ez[m
+[1m+++ b/examples/genetic/genetic.ez[m
+[36m@@ -20,6 +20,8 @@[m [m__________________________________________________________*/[m
+ #define NO_FITNESS_CASES 4[m
+ #define VAR_LEN 2[m
+ #define GROW_FULL_RATIO 0.5[m
+[32m+[m[32m#include <typeinfo>[m[41m[m
+[32m+[m[41m[m
+ [m
+ // this is the number of learning cases computed in parallel.[m
+ // note that on 1024 is the maximum size on fermi architectures 512 on older cards.[m
+[36m@@ -137,7 +139,7 @@[m [mGenomeClass {[m
+ [m
+ \GenomeClass::crossover :[m
+ {[m
+[31m-  simpleCrossOver(parent1,parent2,child);[m
+[32m+[m[32m  //simpleCrossOver(parent1,parent2,child);[m[41m[m
+   child.valid = false;[m
+ }[m
+ \end[m
+[36m@@ -153,24 +155,21 @@[m [mGenomeClass {[m
+ [m
+ \begin operator description :[m
+ [m
+[31m-OP_X, "x", 0, {RESULT=INPUT[0];};[m
+[31m-OP_Y, "y", 0, {RESULT=INPUT[1];};[m
+[32m+[m[32mOP_X, "x", 0, {[m[41m[m
+[32m+[m[32m    RESULT=root->getValue(input);[m[41m[m
+[32m+[m[32m};[m[41m[m
+[32m+[m[32mOP_Y, "y", 0, {RESULT=root->getValue(input);};[m[41m[m
+ OP_ERC, "ERC", 0, {RESULT=ERC;};[m
+ OP_NOT, "NOT", 1, {[m
+[31m-    RESULT = false;[m
+[31m-    for(int i = 0; i < size; i++)[m
+[31m-        RESULT = RESULT || children_values[i];[m
+[31m-    RESULT = !RESULT;[m
+[32m+[m[32m    RESULT = !children_values[0];[m[41m[m
+ };[m
+ OP_OR, "OR", 2, {[m
+     RESULT = false;[m
+     for(int i = 0; i < size; i++)[m
+[31m-        RESULT = RESULT || children_values[i];[m
+[32m+[m[32m        RESULT = children_values[0] || children_values[1];[m[41m[m
+ };[m
+ OP_AND, "AND", 2, {[m
+[31m-    RESULT = true;[m
+[31m-    for(int i = 0; i < size; i++)[m
+[31m-        RESULT = RESULT && children_values[i];[m
+[32m+[m[32m    RESULT = children_values[0] && children_values[1];[m[41m[m
+ };[m
+ [m
+ \end[m
+[1mdiff --git a/libeasea/CGPNode.cpp b/libeasea/CGPNode.cpp[m
+[1mindex c2f59d8..7e36935 100755[m
+[1m--- a/libeasea/CGPNode.cpp[m
+[1m+++ b/libeasea/CGPNode.cpp[m
+[36m@@ -203,6 +203,7 @@[m [mGPNode* construction_method( const int constLen, const int totalLen , const int[m
+   if( node->opCode==OP_ERC ){[m
+     node->erc_value = globalRandomGenerator->random(0.,1.);[m
+   }[m
+[32m+[m
+   //else if( node->opCode==OP_VAR )[m
+   //node->var_id = globalRandomGenerator->random(1,VAR_LEN);[m
+ [m
+[1mdiff --git a/libeasea/include/CGPNode.h b/libeasea/include/CGPNode.h[m
+[1mindex 39a7f1d..dfdcf30 100755[m
+[1m--- a/libeasea/include/CGPNode.h[m
+[1m+++ b/libeasea/include/CGPNode.h[m
+[36m@@ -32,22 +32,14 @@[m [mclass GPNode {[m
+     GPNode* children[2];[m
+ [m
+     virtual float getValue(float input[]){ return 0; }[m
+[31m-    virtual void mutate(){ }[m
+ [m
+     GPNode(){  // Constructor[m
+       for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)[m
+         children[EASEA_Ndx]=NULL;[m
+     }[m
+ [m
+[31m-[m
+[31m-    GPNode(int var_id, double erc_value, char opCode, GPNode** childrenToAdd) : var_id(var_id), erc_value(erc_value), opCode(opCode)// other constructor[m
+[31m-  {[m
+[31m-    for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)[m
+[31m-      this->children[EASEA_Ndx]=childrenToAdd[EASEA_Ndx];[m
+[31m-  }[m
+[31m-[m
+[31m-[m
+     GPNode(const GPNode &EASEA_Var) {  // Copy constructor[m
+[32m+[m[32m        throw 10;[m
+       var_id=EASEA_Var.var_id;[m
+       erc_value=EASEA_Var.erc_value;[m
+       //arity=EASEA_Var.arity;[m
+[36m@@ -65,18 +57,18 @@[m [mclass GPNode {[m
+     }[m
+ [m
+ [m
+[31m-    GPNode& operator=(const GPNode &EASEA_Var) {  // Operator=[m
+[31m-      if (&EASEA_Var == this) return *this;[m
+[31m-      var_id = EASEA_Var.var_id;[m
+[31m-      erc_value = EASEA_Var.erc_value;[m
+[31m-      //arity = EASEA_Var.arity;[m
+[31m-      opCode = EASEA_Var.opCode;[m
+[31m-[m
+[31m-      for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)[m
+[31m-        if(EASEA_Var.children[EASEA_Ndx]) children[EASEA_Ndx] = new GPNode(*(EASEA_Var.children[EASEA_Ndx]));[m
+[31m-[m
+[31m-      return *this;[m
+[31m-    }[m
+[32m+[m[32m//    GPNode& operator=(const GPNode &EASEA_Var) {  // Operator=[m
+[32m+[m[32m//      if (&EASEA_Var == this) return *this;[m
+[32m+[m[32m//      var_id = EASEA_Var.var_id;[m
+[32m+[m[32m//      erc_value = EASEA_Var.erc_value;[m
+[32m+[m[32m//      //arity = EASEA_Var.arity;[m
+[32m+[m[32m//      opCode = EASEA_Var.opCode;[m
+[32m+[m[32m//[m
+[32m+[m[32m//      for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)[m
+[32m+[m[32m//        if(EASEA_Var.children[EASEA_Ndx]) children[EASEA_Ndx] = new GPNode(*(EASEA_Var.children[EASEA_Ndx]));[m
+[32m+[m[32m//[m
+[32m+[m[32m//      return *this;[m
+[32m+[m[32m//    }[m
+ [m
+ [m
+     bool operator==(GPNode &EASEA_Var) const {  // Operator==[m
+[36m@@ -118,7 +110,6 @@[m [mclass GPNodeTerminal : public GPNode {[m
+ class GPNodeVal : public GPNodeTerminal {[m
+   public:[m
+   float value;[m
+[31m-    void mutate(){ value = static_cast <float> (rand()) / static_cast <float> (RAND_MAX); };[m
+ [m
+     float getValue(float input[]){ return value; };[m
+ };[m
+[36m@@ -126,7 +117,6 @@[m [mclass GPNodeVal : public GPNodeTerminal {[m
+ class GPNodeVar : public GPNodeTerminal {[m
+   public:[m
+     int index;[m
+[31m-    void mutate(){};[m
+ [m
+     float getValue(float input[]){ return input[index]; };[m
+ };[m
+[36m@@ -137,7 +127,6 @@[m [mclass GPNodeNonTerminal : public GPNode {[m
+ [m
+ class GPNodeOR : public GPNodeNonTerminal {[m
+   public:[m
+[31m-   void mutate(){};[m
+ [m
+     float getValue(float input[]){[m
+         return children[0]->getValue(input) || children[1]->getValue(input);[m
+[36m@@ -146,7 +135,6 @@[m [mclass GPNodeOR : public GPNodeNonTerminal {[m
+ [m
+ class GPNodeAND : public GPNodeNonTerminal {[m
+   public:[m
+[31m-   void mutate(){};[m
+ [m
+     float getValue(float input[]){[m
+         return children[0]->getValue(input) && children[1]->getValue(input);[m
+[36m@@ -155,7 +143,6 @@[m [mclass GPNodeAND : public GPNodeNonTerminal {[m
+ [m
+ class GPNodeNOT : public GPNodeNonTerminal {[m
+   public:[m
+[31m-   void mutate(){};[m
+ [m
+     float getValue(float input[]){[m
+         return !(children[0]->getValue(input));[m

@@ -105,15 +105,7 @@ std::string toString(GPNode* root){
 
 float recEval(GPNode* root, float* input) {
   float RESULT = 0;
-  GPNode** children = root->children;
-  float children_values[MAX_ARITY];
-  int size;
-  for(size = 0; size < MAX_ARITY; size++) {
-    if(!children[size])
-        break;
 
-    children_values[size] = recEval(children[size],input);
-  }
   switch( root->opCode ){
 \INSERT_GP_CPU_SWITCH
   default:
@@ -138,7 +130,7 @@ GPNode* pickNthNode(GPNode* root, int N, int* childId){
     stackPointer--;
     for( int j=opArity[(int)currentNode->opCode] ; j>0 ; j--){
       parentStack[stackPointer] = currentNode;
-      stack[stackPointer++] = currentNode->children[j-1];
+      stack[stackPointer++] = currentNode->getChild(j-1);
     }
   }
 
@@ -147,7 +139,7 @@ GPNode* pickNthNode(GPNode* root, int N, int* childId){
     stackPointer--;
 
   for( unsigned i=0 ; i<opArity[(int)parentStack[stackPointer]->opCode] ; i++ ){
-    if( parentStack[stackPointer]->children[i]==stack[stackPointer] ){
+    if( parentStack[stackPointer]->getChild(i)==stack[stackPointer] ){
       (*childId)=i;
       break;
     }
@@ -168,9 +160,9 @@ void simple_mutator(IndividualImpl* Genome){
     mutationPointParent = Genome->root;
     mutationPointDepth = 0;
   }
-  delete mutationPointParent->children[mutationPointChildId] ;
-  mutationPointParent->children[mutationPointChildId] =
-    construction_method( VAR_LEN+1, OPCODE_SIZE , 1, TREE_DEPTH_MAX-mutationPointDepth ,0,opArity,OP_ERC);
+  delete mutationPointParent->getChild(mutationPointChildId) ;
+  mutationPointParent->setChild(mutationPointChildId,
+    construction_method( VAR_LEN+1, OPCODE_SIZE , 1, TREE_DEPTH_MAX-mutationPointDepth ,0,opArity,OP_ERC));
 }
 
 
@@ -214,33 +206,33 @@ void simpleCrossOver(IndividualImpl& p1, IndividualImpl& p2, IndividualImpl& c){
     if( Np2!=0 ) graftParentNode = pickNthNode(p2.root, MIN(Np2,nbNodeP1) ,&graftPointChildId);
 
     // is the stock and the graft an authorized type of node (leaf or inner-node)
-    if( Np1 && !stockCouldBeTerminal && opArity[(int)stockParentNode->children[stockPointChildId]->opCode]==0 ) goto choose_node;
-    if( Np2 && !graftCouldBeTerminal && opArity[(int)graftParentNode->children[graftPointChildId]->opCode]==0 ) goto choose_node;
+    if( Np1 && !stockCouldBeTerminal && opArity[(int)stockParentNode->getChild(stockPointChildId)->opCode]==0 ) goto choose_node;
+    if( Np2 && !graftCouldBeTerminal && opArity[(int)graftParentNode->getChild(graftPointChildId)->opCode]==0 ) goto choose_node;
 
     if( Np2 && Np1)
-      childrenDepth = depthOfNode(c.root,stockParentNode)+depthOfTree(graftParentNode->children[graftPointChildId]);
+      childrenDepth = depthOfNode(c.root,stockParentNode)+depthOfTree(graftParentNode->getChild(graftPointChildId));
     else if( Np1 ) childrenDepth = depthOfNode(c.root,stockParentNode)+depthP1;
-    else if( Np2 ) childrenDepth = depthOfTree(graftParentNode->children[graftPointChildId]);
+    else if( Np2 ) childrenDepth = depthOfTree(graftParentNode->getChild(graftPointChildId));
     else childrenDepth = depthP2;
 
   }while( childrenDepth>TREE_DEPTH_MAX );
 
 
   if( Np1 && Np2 ){
-    delete stockParentNode->children[stockPointChildId];
-    stockParentNode->children[stockPointChildId] = graftParentNode->children[graftPointChildId];
-    graftParentNode->children[graftPointChildId] = NULL;
+    delete stockParentNode->getChild(stockPointChildId);
+    stockParentNode->setChild(stockPointChildId, graftParentNode->getChild(graftPointChildId));
+    graftParentNode->setChild(graftPointChildId, NULL);
   }
   else if( Np1 ){ // && Np2==NULL
     // We want to use the root of the parent 2 as graft
-    delete stockParentNode->children[stockPointChildId];
-    stockParentNode->children[stockPointChildId] = p2.root;
+    delete stockParentNode->getChild(stockPointChildId);
+    stockParentNode->setChild(stockPointChildId, p2.root);
     p2.root = NULL;
   }else if( Np2 ){ // && Np1==NULL
     // We want to use the root of the parent 1 as stock
     delete c.root;
-    c.root = graftParentNode->children[graftPointChildId];
-    graftParentNode->children[graftPointChildId] = NULL;
+    c.root = graftParentNode->getChild(graftPointChildId);
+    graftParentNode->setChild(graftPointChildId, NULL);
   }else{
     // We want to switch root nodes between parents
     delete c.root;

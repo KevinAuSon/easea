@@ -21,7 +21,7 @@ extern unsigned opArity[];
 int depthOfTree(GPNode* root){
   int depth = 0;
   for( unsigned i=0 ; i<opArity[(int)root->opCode] ; i++ ){
-    int d = depthOfTree(root->children[i]);
+    int d = depthOfTree(root->getChild(i));
     if( d>=depth ) depth = d;
   }
   return depth+1;
@@ -35,7 +35,7 @@ int depthOfNode(GPNode* root, GPNode* node){
   }
   else{
     for( unsigned i=0 ; i<opArity[(int)root->opCode] ; i++ ){
-      int depth = depthOfNode(root->children[i],node);
+      int depth = depthOfNode(root->getChild(i),node);
       if( depth )
         return depth+1;
     }
@@ -47,7 +47,7 @@ int depthOfNode(GPNode* root, GPNode* node){
 int enumTreeNodes(GPNode* root){
   int nbNode = 0;
   for( unsigned i=0 ; i<opArity[(int)root->opCode] ; i++ ){
-    nbNode+=enumTreeNodes(root->children[i]);
+    nbNode+=enumTreeNodes(root->getChild(i));
   }
   return nbNode+1;
 }
@@ -78,7 +78,7 @@ int collectNodesDepth(const int goalDepth, GPNode** collection, int collected, i
   }
   else{
     for( unsigned i=0 ; i<opArity[(int)root->opCode] ; i++ ){
-      collected=collectNodesDepth(goalDepth, collection, collected, currentDepth+1, root->children[i]);
+      collected=collectNodesDepth(goalDepth, collection, collected, currentDepth+1, root->getChild(i));
     }
     return collected;
   }
@@ -195,7 +195,7 @@ GPNode* construction_method( const int constLen, const int totalLen , const int 
 
   // construct children (if any)
   for( int i=0 ; i<arity ; i++ )
-    node->children[i] = construction_method(constLen, totalLen, currentDepth+1, maxDepth, full, opArity, OP_ERC);
+    node->setChild(i, construction_method(constLen, totalLen, currentDepth+1, maxDepth, full, opArity, OP_ERC));
 
   //else if( node->opCode==OP_VAR )
   //node->var_id = globalRandomGenerator->random(1,VAR_LEN);
@@ -226,16 +226,16 @@ void toString_r(std::ostringstream* oss, GPNode* root, const unsigned* opArity ,
 
   (*oss) << '(';
   if (opArity[(int)root->opCode] == 2) {
-    toString_r(oss,root->children[0],opArity,opCodeName,OP_ERC);
+    toString_r(oss,root->getChild(0),opArity,opCodeName,OP_ERC);
     (*oss) << ' ';
     (*oss) << opCodeName[(int)root->opCode];
     (*oss) << ' ';
-    toString_r(oss,root->children[1],opArity,opCodeName,OP_ERC);
+    toString_r(oss,root->getChild(1),opArity,opCodeName,OP_ERC);
   } else {
     (*oss) << opCodeName[(int)root->opCode];
     for (unsigned i = 0; i < opArity[(int)root->opCode]; ++i) {
-      if (root->children[i]) {
-  toString_r(oss,root->children[i],opArity,opCodeName,OP_ERC);
+      if (root->getChild(i)) {
+  toString_r(oss,root->getChild(i),opArity,opCodeName,OP_ERC);
   if (i < opArity[(int)root->opCode] - 1) {
     (*oss) << ' ';
   }
@@ -269,9 +269,9 @@ void toDotFile_r(GPNode* root, FILE* outputFile, const unsigned* opArity , const
   fprintf(outputFile," %ld [label=\"%s\"];\n", (long int)root, opCodeName[(int)root->opCode]);
 
   for( unsigned i=0 ; i<opArity[(int)root->opCode] ; i++ ){
-    if( root->children[i] ){
-      fprintf(outputFile,"%ld -> %ld;\n", (long int)root, (long int)root->children[i]);
-      toDotFile_r( root->children[i] , outputFile,opArity,opCodeName,OP_ERC);
+    if( root->getChild(i) ){
+      fprintf(outputFile,"%ld -> %ld;\n", (long int)root, (long int)root->getChild(i));
+      toDotFile_r( root->getChild(i) , outputFile,opArity,opCodeName,OP_ERC);
     }
   }
 }

@@ -29,6 +29,7 @@ class GPNode {
     virtual bool isTerminal() = 0;
     virtual float getValue(float input[]) = 0;
     virtual GPNode* clone() = 0;
+    virtual float reduce(float (*reduceFunction)(GPNode*, float), float result) = 0;
     virtual GPNode* getChild(int i) { return NULL; }
     virtual GPNode* setChild(int i, GPNode* node) { return this; }
 
@@ -36,7 +37,11 @@ class GPNode {
 };
 
 class GPNodeTerminal : public GPNode {
-    bool isTerminal() { return true; }
+    public:
+        bool isTerminal() { return true; }
+        float reduce(float (*reduceFunction)(GPNode*, float), float result) {
+            return reduceFunction(this, result);
+        }
 };
 
 class GPNodeVal : public GPNodeTerminal {
@@ -70,14 +75,6 @@ class GPNodeVar : public GPNodeTerminal {
 };
 
 class GPNodeNonTerminal : public GPNode {
-    private:
-        GPNode* mapChildrenAux(GPNode* (*mapFunction)(GPNode*), int size) {
-            for(int i = 0; i < size; i++)
-                children[i] = mapFunction(childre[i]);
-
-            return this;
-        }
-
     protected:
         GPNode* children[MAX_ARITY];
         int size;
@@ -104,12 +101,13 @@ class GPNodeNonTerminal : public GPNode {
             return this;
         }
 
-        GPNode* mapChildren(GPNode* (*mapFunction)(GPNode*)) {
-            return mapChildrenAux(mapFunction, size);
-        }
+        float reduce(float (*reduceFunction)(GPNode*, float), float result) {
+            result = reduceFunction(this, result);
 
-        GPNode* mapAllChildren(GPNode* (*mapFunction)(GPNode*)) {
-            return mapChildrenAux(mapFunction, MAX_ARITY);
+            for(int i = 0; i < size; i++)
+                result = ((GPNodeNonTerminal*)children[i])->reduce(reduceFunction, result);
+
+            return result;
         }
 };
 

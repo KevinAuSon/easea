@@ -71,16 +71,18 @@ class GPNodeVar : public GPNodeTerminal {
 
 class GPNodeNonTerminal : public GPNode {
     protected:
-        GPNode* children[2];
+        GPNode* children[MAX_ARITY];
+        int size;
+
     public:
 
-        GPNodeNonTerminal(){  // Constructor
-          for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
+        GPNodeNonTerminal() : size(0) {  // Constructor
+          for(int EASEA_Ndx=0; EASEA_Ndx<MAX_ARITY; EASEA_Ndx++)
             children[EASEA_Ndx]=NULL;
         }
 
         virtual ~GPNodeNonTerminal() {  // Destructor
-          for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
+          for(int EASEA_Ndx=0; EASEA_Ndx<MAX_ARITY; EASEA_Ndx++)
             if( children[EASEA_Ndx] ) delete children[EASEA_Ndx];
         }
 
@@ -89,6 +91,7 @@ class GPNodeNonTerminal : public GPNode {
         virtual GPNode* getChild(int i) { return children[i]; }
 
         virtual GPNode* setChild(int i, GPNode* node) {
+            if(i > size) size = i;
             children[i] = node;
             return this;
         }

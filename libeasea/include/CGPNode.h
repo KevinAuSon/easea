@@ -70,6 +70,14 @@ class GPNodeVar : public GPNodeTerminal {
 };
 
 class GPNodeNonTerminal : public GPNode {
+    private:
+        GPNode* mapChildrenAux(GPNode* (*mapFunction)(GPNode*), int size) {
+            for(int i = 0; i < size; i++)
+                children[i] = mapFunction(childre[i]);
+
+            return this;
+        }
+
     protected:
         GPNode* children[MAX_ARITY];
         int size;
@@ -88,12 +96,20 @@ class GPNodeNonTerminal : public GPNode {
 
         bool isTerminal() { return false; }
 
-        virtual GPNode* getChild(int i) { return children[i]; }
+        GPNode* getChild(int i) { return children[i]; }
 
-        virtual GPNode* setChild(int i, GPNode* node) {
+        GPNode* setChild(int i, GPNode* node) {
             if(i > size) size = i;
             children[i] = node;
             return this;
+        }
+
+        GPNode* mapChildren(GPNode* (*mapFunction)(GPNode*)) {
+            return mapChildrenAux(mapFunction, size);
+        }
+
+        GPNode* mapAllChildren(GPNode* (*mapFunction)(GPNode*)) {
+            return mapChildrenAux(mapFunction, MAX_ARITY);
         }
 };
 

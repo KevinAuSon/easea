@@ -155,34 +155,12 @@ GenomeClass {
 
 \begin operator description :
 
-OP_X, "x", 0, {
-//    if(root->getValue(input) != input[0])
-//        throw 'x';
-
-    RESULT=root->getValue(input);
-};
-OP_Y, "y", 0, {
-//if(root->getValue(input) != input[0])
-//        throw 'y';
-        RESULT=root->getValue(input);};
-OP_ERC, "ERC", 0, {RESULT=ERC;};
-OP_NOT, "NOT", 1, {
-    RESULT = !children_values[0];
-
-};
-OP_OR, "OR", 2, {
-    RESULT = false;
-    for(int i = 0; i < size; i++)
-        RESULT = children_values[0] || children_values[1];
-
-    root->getValue(input);
-    std::cout << "recEval: " << children_values[0] << " "
-             << children_values[1] << std::endl;
-};
-OP_AND, "AND", 2, {
-    RESULT = children_values[0] && children_values[1];
-
-};
+OP_X, "x", 0, { RESULT=root->getValue(input); };
+OP_Y, "y", 0, { RESULT=root->getValue(input); };
+OP_ERC, "ERC", 0, {RESULT=root->getValue(input);};
+OP_NOT, "NOT", 1, {RESULT=root->getValue(input);};
+OP_OR, "OR", 2, {RESULT=root->getValue(input);};
+OP_AND, "AND", 2, {RESULT=root->getValue(input);};
 
 \end
 
@@ -204,11 +182,11 @@ OP_AND, "AND", 2, {
 
 
 \Default run parameters :         // Please let the parameters appear in this order
-  Number of generations : 2   	// NB_GEN
+  Number of generations : 50   	// NB_GEN
   Time limit: 0 			// In seconds, 0 to deactivate
-  Population size : 1			//POP_SIZE
-  Offspring size : 1 // 40%
-  Mutation probability : 0.1       // MUT_PROB
+  Population size : 5000			//POP_SIZE
+  Offspring size : 5000 // 40%
+  Mutation probability : 0.2       // MUT_PROB
   Crossover probability : 0.9      // XOVER_PROB
   Evaluator goal : minimise      // Maximise
   Selection operator: Tournament 50
@@ -234,10 +212,10 @@ OP_AND, "AND", 2, {
   Save population: false
   Start from file:false
 
-  max init tree depth : 3
+  max init tree depth : 4
   min init tree depth : 2
 
-  max tree depth : 3
+  max tree depth : 8
 
   size of prog buffer : 200000000
 \end

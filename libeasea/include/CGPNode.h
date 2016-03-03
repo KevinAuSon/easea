@@ -158,9 +158,6 @@ class GPNodeOR : public GPNodeNonTerminal {
   public:
 
     float getValue(float input[]){
-        std::cout << "getValue : " << children[0]->getValue(input) << " "
-             << children[1]->getValue(input) << std::endl;
-
         return children[0]->getValue(input) || children[1]->getValue(input);
     };
 

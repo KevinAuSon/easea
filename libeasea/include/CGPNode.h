@@ -22,8 +22,6 @@ using namespace std;
  **/
 
 class GPNode {
-    protected:
-        GPNode* children[2];
   public:
     int opCode;
 
@@ -31,21 +29,10 @@ class GPNode {
     virtual bool isTerminal() = 0;
     virtual float getValue(float input[]) = 0;
     virtual GPNode* clone() = 0;
-    virtual GPNode* getChild(int i) { return children[i]; }
-    virtual GPNode* setChild(int i, GPNode* node) {
-        children[i] = node;
-        return this;
-    }
+    virtual GPNode* getChild(int i) { return NULL; }
+    virtual GPNode* setChild(int i, GPNode* node) { return this; }
 
-    GPNode(){  // Constructor
-      for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
-        children[EASEA_Ndx]=NULL;
-    }
-
-    virtual ~GPNode() {  // Destructor
-      for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
-        if( children[EASEA_Ndx] ) delete children[EASEA_Ndx];
-    }
+    virtual ~GPNode() {;}
 };
 
 class GPNodeTerminal : public GPNode {
@@ -63,10 +50,6 @@ class GPNodeVal : public GPNodeTerminal {
         result->value = value;
         result->opCode = opCode;
 
-        for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
-        if( children[EASEA_Ndx] ) result->children[EASEA_Ndx] = children[EASEA_Ndx]->clone();
-        else  result->children[EASEA_Ndx] = NULL;
-
         return result;
     }
 };
@@ -82,16 +65,33 @@ class GPNodeVar : public GPNodeTerminal {
         result->index = index;
         result->opCode = opCode;
 
-        for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
-        if( children[EASEA_Ndx] ) result->children[EASEA_Ndx] = children[EASEA_Ndx]->clone();
-        else  result->children[EASEA_Ndx] = NULL;
-
         return result;
     }
 };
 
 class GPNodeNonTerminal : public GPNode {
-    bool isTerminal() { return false; }
+    protected:
+        GPNode* children[2];
+    public:
+
+        GPNodeNonTerminal(){  // Constructor
+          for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
+            children[EASEA_Ndx]=NULL;
+        }
+
+        virtual ~GPNodeNonTerminal() {  // Destructor
+          for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
+            if( children[EASEA_Ndx] ) delete children[EASEA_Ndx];
+        }
+
+        bool isTerminal() { return false; }
+
+        virtual GPNode* getChild(int i) { return children[i]; }
+
+        virtual GPNode* setChild(int i, GPNode* node) {
+            children[i] = node;
+            return this;
+        }
 };
 
 class GPNodeOR : public GPNodeNonTerminal {

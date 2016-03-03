@@ -96,7 +96,7 @@ class GPNodeNonTerminal : public GPNode {
         GPNode* getChild(int i) { return children[i]; }
 
         GPNode* setChild(int i, GPNode* node) {
-            if(i > size) size = i;
+            if(i >= size) size = i+1;
             children[i] = node;
             return this;
         }
@@ -109,6 +109,14 @@ class GPNodeNonTerminal : public GPNode {
 
             return result;
         }
+
+        void cloneHelp(GPNodeNonTerminal* result) {
+            result->opCode = opCode;
+            result->size = size;
+
+            for(int i = 0; i < size; i++)
+                result->children[i] = children[i]->clone();
+        }
 };
 
 class GPNodeOR : public GPNodeNonTerminal {
@@ -120,11 +128,7 @@ class GPNodeOR : public GPNodeNonTerminal {
 
     GPNode* clone() {
         GPNodeOR* result = new GPNodeOR();
-        result->opCode = opCode;
-
-        for(int i = 0; i < 2; i++)
-            result->children[i] = children[i]->clone();
-
+        cloneHelp(result);
         return result;
     }
 };
@@ -138,11 +142,7 @@ class GPNodeAND : public GPNodeNonTerminal {
 
     GPNode* clone() {
         GPNodeAND* result = new GPNodeAND();
-        result->opCode = opCode;
-
-        for(int i = 0; i < 2; i++)
-            result->children[i] = children[i]->clone();
-
+        cloneHelp(result);
         return result;
     }
 };
@@ -156,10 +156,7 @@ class GPNodeNOT : public GPNodeNonTerminal {
 
     GPNode* clone() {
         GPNodeNOT* result = new GPNodeNOT();
-        result->opCode = opCode;
-
-        result->children[0] = children[0]->clone();
-
+        cloneHelp(result);
         return result;
     }
 };

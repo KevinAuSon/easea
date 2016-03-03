@@ -68,27 +68,10 @@ int generateData(){
   return NO_FITNESS_CASES;
 }
 
-int reduceTreeSize(GPNode* root) {
-    int result = 1;
-
-    for(int i = 0; i < 2; i++) {
-        if(root->getChild(i))
-        result += reduceTreeSize(root->getChild(i));
-    }
-
-    return result;
-}
-
+float inc(GPNode* n, float res) { return res+1; }
 
 int treeSize(GPNode* root) {
-    int result = 1;
-
-    for(int i = 0; i < 2; i++) {
-        if(root->getChild(i))
-        result += treeSize(root->getChild(i));
-    }
-
-    return result;
+    return root->reduce(inc, 0);
 }
 
 void free_data(){
@@ -110,7 +93,7 @@ void free_data(){
 \After everything else function:
 {
   std::cout << toString(((IndividualImpl*)EA->population->Best)->root) << std::endl;
-  std::cout << reduceTreeSize(((IndividualImpl*)EA->population->Best)->root) << std::endl;
+  std::cout << "len : " << treeSize(((IndividualImpl*)EA->population->Best)->root) << std::endl;
   free_data();
 }
 \end
@@ -126,7 +109,14 @@ void free_data(){
   //cout << "At the end of each generation function called" << endl;
 }
 \end
+int result = 1;
 
+    for(int i = 0; i < 2; i++) {
+        if(root->getChild(i))
+        result += reduceTreeSize(root->getChild(i));
+    }
+
+    return result;
 \At each generation before reduce function:
  //cout << "At each generation before replacement function called" << endl;
 \end
@@ -193,7 +183,7 @@ OP_AND, "AND", 2, {RESULT=root->getValue(input);};
 \end
 
 
-\Default run parameters :         // Please let the parameters appear in this order
+\Default run parameters :         // Please let the parameter looks like you compiled EASEA successfully.s appear in this order
   Number of generations : 30   	// NB_GEN
   Time limit: 0 			// In seconds, 0 to deactivate
   Population size : 5000			//POP_SIZE

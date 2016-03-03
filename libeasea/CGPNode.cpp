@@ -144,6 +144,7 @@ GPNode* init_node(int i) {
             break;
         case 2:
             node = new GPNodeVal();
+            ((GPNodeVal*)node)->value =  globalRandomGenerator->random(0.,1.);
             break;
         case 3:
             node = new GPNodeNOT();
@@ -196,14 +197,6 @@ GPNode* construction_method( const int constLen, const int totalLen , const int 
   for( int i=0 ; i<arity ; i++ )
     node->children[i] = construction_method(constLen, totalLen, currentDepth+1, maxDepth, full, opArity, OP_ERC);
 
-  // affect null to other array cells (if any)
-  for( int i=arity ; i<MAX_ARITY ; i++ )
-    node->children[i] = NULL;
-
-  if( node->opCode==OP_ERC ){
-    node->erc_value = globalRandomGenerator->random(0.,1.);
-  }
-
   //else if( node->opCode==OP_VAR )
   //node->var_id = globalRandomGenerator->random(1,VAR_LEN);
 
@@ -239,11 +232,7 @@ void toString_r(std::ostringstream* oss, GPNode* root, const unsigned* opArity ,
     (*oss) << ' ';
     toString_r(oss,root->children[1],opArity,opCodeName,OP_ERC);
   } else {
-    if (root->opCode == OP_ERC) {
-      (*oss) << root->erc_value;
-    } else {
-      (*oss) << opCodeName[(int)root->opCode];
-    }
+    (*oss) << opCodeName[(int)root->opCode];
     for (unsigned i = 0; i < opArity[(int)root->opCode]; ++i) {
       if (root->children[i]) {
   toString_r(oss,root->children[i],opArity,opCodeName,OP_ERC);
@@ -277,11 +266,7 @@ std::string toString(GPNode* root, const unsigned* opArity , const char** opCode
    without any warning.
  */
 void toDotFile_r(GPNode* root, FILE* outputFile, const unsigned* opArity , const char** opCodeName, int OP_ERC){
-  if( root->opCode==OP_ERC )
-    fprintf(outputFile," %ld [label=\"%s : %f\"];\n", (long int)root, opCodeName[(int)root->opCode],
-      root->erc_value);
- else
-   fprintf(outputFile," %ld [label=\"%s\"];\n", (long int)root, opCodeName[(int)root->opCode]);
+  fprintf(outputFile," %ld [label=\"%s\"];\n", (long int)root, opCodeName[(int)root->opCode]);
 
   for( unsigned i=0 ; i<opArity[(int)root->opCode] ; i++ ){
     if( root->children[i] ){

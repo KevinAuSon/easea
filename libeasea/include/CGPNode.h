@@ -23,14 +23,10 @@ using namespace std;
 
 class GPNode {
   public:
-
-    // Class members
-    int var_id;
-    double erc_value;
-    // char opCode;
     int opCode;
     GPNode* children[2];
 
+    virtual bool isTerminal() = 0;
     virtual float getValue(float input[]) = 0;
     virtual GPNode* clone() = 0;
 
@@ -72,36 +68,36 @@ class GPNode {
 //    }
 
 
-    bool operator==(GPNode &EASEA_Var) const {  // Operator==
-      if (var_id!=EASEA_Var.var_id) return false;
-      if (erc_value!=EASEA_Var.erc_value) return false;
-      //if (arity!=EASEA_Var.arity) return false;
-      if (opCode!=EASEA_Var.opCode) return false;
-
-      {for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
-        if (children[EASEA_Ndx]!=EASEA_Var.children[EASEA_Ndx]) return false;}
-
-      return true;
-    }
-
-
-    bool operator!=(GPNode &EASEA_Var) const {return !(*this==EASEA_Var);} // operator!=
-
-
-    friend ostream& operator<< (ostream& os, const GPNode& EASEA_Var) { // Output stream insertion operator
-      os <<  "var_id:" << EASEA_Var.var_id << "\n";
-      os <<  "erc_value:" << EASEA_Var.erc_value << "\n";
-      //os <<  "arity:" << EASEA_Var.arity << "\n";
-      os <<  "opCode:" << EASEA_Var.opCode << "\n";
-
-      {os << "Array children : ";
-        for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
-          if( EASEA_Var.children[EASEA_Ndx] ) os << "[" << EASEA_Ndx << "]:" << *(EASEA_Var.children[EASEA_Ndx]) << "\t";}
-
-      os << "\n";
-
-      return os;
-    }
+//    bool operator==(GPNode &EASEA_Var) const {  // Operator==
+//      if (var_id!=EASEA_Var.var_id) return false;
+//      if (erc_value!=EASEA_Var.erc_value) return false;
+//      //if (arity!=EASEA_Var.arity) return false;
+//      if (opCode!=EASEA_Var.opCode) return false;
+//
+//      {for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
+//        if (children[EASEA_Ndx]!=EASEA_Var.children[EASEA_Ndx]) return false;}
+//
+//      return true;
+//    }
+//
+//
+//    bool operator!=(GPNode &EASEA_Var) const {return !(*this==EASEA_Var);} // operator!=
+//
+//
+//    friend ostream& operator<< (ostream& os, const GPNode& EASEA_Var) { // Output stream insertion operator
+//      os <<  "var_id:" << EASEA_Var.var_id << "\n";
+//      os <<  "erc_value:" << EASEA_Var.erc_value << "\n";
+//      //os <<  "arity:" << EASEA_Var.arity << "\n";
+//      os <<  "opCode:" << EASEA_Var.opCode << "\n";
+//
+//      {os << "Array children : ";
+//        for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
+//          if( EASEA_Var.children[EASEA_Ndx] ) os << "[" << EASEA_Ndx << "]:" << *(EASEA_Var.children[EASEA_Ndx]) << "\t";}
+//
+//      os << "\n";
+//
+//      return os;
+//    }
 };
 
 class GPNodeTerminal : public GPNode {
@@ -117,8 +113,6 @@ class GPNodeVal : public GPNodeTerminal {
     GPNode* clone() {
         GPNodeVal* result = new GPNodeVal();
         result->value = value;
-        result->var_id = var_id;
-        result->erc_value = erc_value;
         result->opCode = opCode;
 
         for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
@@ -138,8 +132,6 @@ class GPNodeVar : public GPNodeTerminal {
    GPNode* clone() {
         GPNodeVar* result = new GPNodeVar();
         result->index = index;
-        result->var_id = var_id;
-        result->erc_value = erc_value;
         result->opCode = opCode;
 
         for(int EASEA_Ndx=0; EASEA_Ndx<2; EASEA_Ndx++)
@@ -163,8 +155,6 @@ class GPNodeOR : public GPNodeNonTerminal {
 
     GPNode* clone() {
         GPNodeOR* result = new GPNodeOR();
-        result->var_id = var_id;
-        result->erc_value = erc_value;
         result->opCode = opCode;
 
         for(int i = 0; i < 2; i++)
@@ -183,8 +173,6 @@ class GPNodeAND : public GPNodeNonTerminal {
 
     GPNode* clone() {
         GPNodeAND* result = new GPNodeAND();
-        result->var_id = var_id;
-        result->erc_value = erc_value;
         result->opCode = opCode;
 
         for(int i = 0; i < 2; i++)
@@ -203,8 +191,6 @@ class GPNodeNOT : public GPNodeNonTerminal {
 
     GPNode* clone() {
         GPNodeNOT* result = new GPNodeNOT();
-        result->var_id = var_id;
-        result->erc_value = erc_value;
         result->opCode = opCode;
 
         result->children[0] = children[0]->clone();
